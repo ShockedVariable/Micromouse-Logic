@@ -144,7 +144,7 @@ void setup()
 // }
 
 
-void set_motor_l(const int& dir, const int& mspeed) 
+void set_motor_l(const Direction& dir, const int& mspeed) 
 {
 	switch(dir)
 	{
@@ -166,7 +166,7 @@ void set_motor_l(const int& dir, const int& mspeed)
 	}
 }
 
-void set_motor_r(const int& dir, const int& mspeed) 
+void set_motor_r(const Direction& dir, const int& mspeed) 
 {
 	switch(dir)
 	{
