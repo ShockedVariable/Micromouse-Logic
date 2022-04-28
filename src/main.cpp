@@ -1,7 +1,5 @@
 #include <Arduino.h>
 #include "pins.hpp"
-//#define SW_2_PIN 12
-//#define RGB_DATA_PIN 10
 
 enum Direction 
 {
@@ -64,24 +62,15 @@ void setup()
 
   pinMode(BUZZ_PIN, OUTPUT);
   pinMode(SW_1_PIN, INPUT);
-  //pinMode(RGB_DATA_PIN, OUTPUT);
 
-  //analogWriteFrequency(M1_BACK_PIN, 488.28);
-  //analogWriteFrequency(M1_FWD_PIN, 488.28);
-  //analogWriteFrequency(M1_SPD_PIN, 488.28);
-  //analogWriteFrequency(M2_BACK_PIN, 488.28);
- //analogWriteFrequency(M2_FWD_PIN, 488.28);
-  //analogWriteFrequency(M2_SPD_PIN, 488.28);
   
-//00  analogWriteFrequency(BUZZ_PIN, 488.28);
-
-  //Interrupts
   /*
-  We have pins A and B to determine whether the encoder is going forward or backwards.
+  We have pins A and B on the encoder to determine whether the encoder is going forward or backwards.
   If in the serial monitor we see ENCA first, we know that we are moving backwards. If
-  in the serial monitor we see ENCb first, we know that we are moving forwards.
+  in the serial monitor we see ENCB first, we know that we are moving forwards.
   */
 
+  //Interrupts
   attachInterrupt(M2_ENC_A_PIN, enc_a_l_intr_handler, FALLING); //check if rising or falling
   attachInterrupt(M2_ENC_B_PIN, enc_b_l_intr_handler, FALLING);
   attachInterrupt(M1_ENC_A_PIN, enc_a_r_intr_handler, FALLING);
@@ -155,7 +144,8 @@ void setup()
 // }
 
 
-void set_motor_l(int dir, int mspeed) {
+void set_motor_l(const int& dir, const int& mspeed) 
+{
       if (dir == FORWARDS) {
         digitalWrite(M2_FWD_PIN, LOW);
         digitalWrite(M2_BACK_PIN, HIGH);
