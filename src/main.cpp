@@ -146,45 +146,46 @@ void setup()
 
 void set_motor_l(const int& dir, const int& mspeed) 
 {
-      if (dir == FORWARDS) {
-        digitalWrite(M2_FWD_PIN, LOW);
-        digitalWrite(M2_BACK_PIN, HIGH);
-        analogWrite(M2_SPD_PIN, mspeed);
-    } else if (dir == BACKWARDS) {
-        digitalWrite(M2_FWD_PIN, HIGH);
-        digitalWrite(M2_BACK_PIN, LOW);
-        analogWrite(M2_SPD_PIN, mspeed);
-    } else if (dir == STOP) {
-        digitalWrite(M2_FWD_PIN, LOW);
-        digitalWrite(M2_BACK_PIN, LOW);
-        analogWrite(M2_SPD_PIN, 0);
-    } else {
-        //incorrect direction given
-    }
+	switch(dir)
+	{
+		case Direction::FORWARDS:
+			digitalWrite(M2_FWD_PIN, LOW);
+			digitalWrite(M2_BACK_PIN, HIGH);
+			analogWrite(M2_SPD_PIN, mspeed);
+			break;
+		case Direction::BACKWARDS:
+			digitalWrite(M2_FWD_PIN, HIGH);
+			digitalWrite(M2_BACK_PIN, LOW);
+			analogWrite(M2_SPD_PIN, mspeed);
+			break;
+		case Direction::STOP:
+			digitalWrite(M2_FWD_PIN, LOW);
+			digitalWrite(M2_BACK_PIN, LOW);
+			analogWrite(M2_SPD_PIN, 0);
+			break;
+	}
 }
 
-void set_motor_r(int dir, int mspeed) {
-      if (dir == FORWARDS) {
-
-        digitalWrite(M1_BACK_PIN, LOW);
-        digitalWrite(M1_FWD_PIN, HIGH);
-        analogWrite(M1_SPD_PIN, mspeed);
-    } else if (dir == BACKWARDS) {
-        digitalWrite(M1_FWD_PIN, LOW);
-        digitalWrite(M1_BACK_PIN, HIGH);
-        analogWrite(M1_SPD_PIN, mspeed);
-    } else if (dir == STOP) {
-        analogWrite(M1_SPD_PIN, 0);
-        digitalWrite(M1_FWD_PIN, LOW);
-        digitalWrite(M1_BACK_PIN, LOW);
-
-    } else {
-        //incorrect direction given
-#ifdef DEBUG
-        //TODO: Blink some LED's
-#endif
-    }
-
+void set_motor_r(const int& dir, const int& mspeed) 
+{
+	switch(dir)
+	{
+		case Direction::FORWARDS:
+			digitalWrite(M1_BACK_PIN, LOW);
+			digitalWrite(M1_FWD_PIN, HIGH);
+			analogWrite(M1_SPD_PIN, mspeed);
+			break;
+		case Direction::BACKWARDS:
+			digitalWrite(M1_FWD_PIN, LOW);
+			digitalWrite(M1_BACK_PIN, HIGH);
+			analogWrite(M1_SPD_PIN, mspeed);
+			break;
+		case Direction::STOP:
+			analogWrite(M1_SPD_PIN, 0);
+			digitalWrite(M1_FWD_PIN, LOW);
+			digitalWrite(M1_BACK_PIN, LOW);
+			break;
+	}
 }
 
 void set_motor_l_pulse_dir(int dir, int mspeed) {
