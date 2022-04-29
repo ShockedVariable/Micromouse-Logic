@@ -1,63 +1,65 @@
 #include <Arduino.h>
 #include "directions.hpp"
+#include "micromouse.hpp"
 #include "pins.hpp"
 
-void enc_a_l_intr_handler() 
-{
-  enc_a_l_count++;
-  Serial.print("ENCAL: ");
-  Serial.println(enc_a_l_count);
-}
+// void enc_a_l_intr_handler() 
+// {
+//   enc_a_l_count++;
+//   Serial.print("ENCAL: ");
+//   Serial.println(enc_a_l_count);
+// }
 
-void enc_b_l_intr_handler() 
-{
-  enc_b_l_count++;
-  Serial.print("ENCBL: ");
-  Serial.println(enc_b_l_count);
-}
+// void enc_b_l_intr_handler() 
+// {
+//   enc_b_l_count++;
+//   Serial.print("ENCBL: ");
+//   Serial.println(enc_b_l_count);
+// }
 
-void enc_a_r_intr_handler() 
-{
-  enc_a_r_count++;
-  Serial.print("ENCAR: ");
-  Serial.println(enc_a_r_count);
-}
+// void enc_a_r_intr_handler() 
+// {
+//   enc_a_r_count++;
+//   Serial.print("ENCAR: ");
+//   Serial.println(enc_a_r_count);
+// }
 
-void enc_b_r_intr_handler() 
-{
-  enc_b_r_count++;
-  Serial.print("ENCBR: ");
-  Serial.println(enc_b_r_count);
-}
-
+// void enc_b_r_intr_handler() 
+// {
+//   enc_b_r_count++;
+//   Serial.print("ENCBR: ");
+//   Serial.println(enc_b_r_count);
+// }
+MicroMouse mm{0, 0, 0, 0};
 
 void setup() 
 {
-  Serial.begin(9600);
-  pinMode(EMIT_L_PIN, OUTPUT);
-  pinMode(EMIT_R_PIN, OUTPUT);
-  pinMode(EMIT_FL_PIN, OUTPUT);
-  pinMode(EMIT_FR_PIN, OUTPUT);
 
-  pinMode(RECIVER_L_PIN, INPUT);
-  pinMode(RECIVER_R_PIN, INPUT);
-  pinMode(RECIVER_FL_PIN, INPUT);
-  pinMode(RECIVER_FR_PIN, INPUT);
+  // Serial.begin(9600);
+  // pinMode(EMIT_L_PIN, OUTPUT);
+  // pinMode(EMIT_R_PIN, OUTPUT);
+  // pinMode(EMIT_FL_PIN, OUTPUT);
+  // pinMode(EMIT_FR_PIN, OUTPUT);
 
-  pinMode(M1_BACK_PIN, OUTPUT);
-  pinMode(M1_FWD_PIN, OUTPUT);
-  pinMode(M1_SPD_PIN, OUTPUT);
-  pinMode(M1_ENC_A_PIN, INPUT); //check if input pullup
-  pinMode(M1_ENC_B_PIN, INPUT);
+  // pinMode(RECIVER_L_PIN, INPUT);
+  // pinMode(RECIVER_R_PIN, INPUT);
+  // pinMode(RECIVER_FL_PIN, INPUT);
+  // pinMode(RECIVER_FR_PIN, INPUT);
 
-  pinMode(M2_BACK_PIN, OUTPUT);
-  pinMode(M2_FWD_PIN, OUTPUT);
-  pinMode(M2_SPD_PIN, OUTPUT);
-  pinMode(M2_ENC_A_PIN, INPUT); //check if input pullup
-  pinMode(M2_ENC_B_PIN, INPUT);
+  // pinMode(M1_BACK_PIN, OUTPUT);
+  // pinMode(M1_FWD_PIN, OUTPUT);
+  // pinMode(M1_SPD_PIN, OUTPUT);
+  // pinMode(M1_ENC_A_PIN, INPUT); //check if input pullup
+  // pinMode(M1_ENC_B_PIN, INPUT);
 
-  pinMode(BUZZ_PIN, OUTPUT);
-  pinMode(SW_1_PIN, INPUT);
+  // pinMode(M2_BACK_PIN, OUTPUT);
+  // pinMode(M2_FWD_PIN, OUTPUT);
+  // pinMode(M2_SPD_PIN, OUTPUT);
+  // pinMode(M2_ENC_A_PIN, INPUT); //check if input pullup
+  // pinMode(M2_ENC_B_PIN, INPUT);
+
+  // pinMode(BUZZ_PIN, OUTPUT);
+  // pinMode(SW_1_PIN, INPUT);
 
   
   /*
@@ -65,13 +67,16 @@ void setup()
   If in the serial monitor we see ENCA first, we know that we are moving backwards. If
   in the serial monitor we see ENCB first, we know that we are moving forwards.
   */
-
+ 
   //Interrupts
-  attachInterrupt(M2_ENC_A_PIN, enc_a_l_intr_handler, FALLING); //check if rising or falling
-  attachInterrupt(M2_ENC_B_PIN, enc_b_l_intr_handler, FALLING);
-  attachInterrupt(M1_ENC_A_PIN, enc_a_r_intr_handler, FALLING);
-  attachInterrupt(M1_ENC_B_PIN, enc_b_r_intr_handler, FALLING);
-  delay(2000);
+//   attachInterrupt(M2_ENC_A_PIN, enc_a_l_intr_handler, FALLING); //check if rising or falling
+//   attachInterrupt(M2_ENC_B_PIN, enc_b_l_intr_handler, FALLING);
+//   attachInterrupt(M1_ENC_A_PIN, enc_a_r_intr_handler, FALLING);
+//   attachInterrupt(M1_ENC_B_PIN, enc_b_r_intr_handler, FALLING);
+	mm.initConnections();
+	mm.attachInterrupts();
+
+  	delay(2000);
 }
 
 
@@ -140,111 +145,111 @@ void setup()
 // }
 
 
-void set_motor_l(const Direction& dir, const int& mspeed) 
-{
-	switch(dir)
-	{
-		case Direction::FORWARDS:
-			digitalWrite(M2_FWD_PIN, LOW);
-			digitalWrite(M2_BACK_PIN, HIGH);
-			analogWrite(M2_SPD_PIN, mspeed);
-			break;
-		case Direction::BACKWARDS:
-			digitalWrite(M2_FWD_PIN, HIGH);
-			digitalWrite(M2_BACK_PIN, LOW);
-			analogWrite(M2_SPD_PIN, mspeed);
-			break;
-		case Direction::STOP:
-			digitalWrite(M2_FWD_PIN, LOW);
-			digitalWrite(M2_BACK_PIN, LOW);
-			analogWrite(M2_SPD_PIN, 0);
-			break;
-	}
-}
+// void set_motor_l(const Direction& dir, const int& mspeed) 
+// {
+// 	switch(dir)
+// 	{
+// 		case Direction::FORWARDS:
+// 			digitalWrite(M2_FWD_PIN, LOW);
+// 			digitalWrite(M2_BACK_PIN, HIGH);
+// 			analogWrite(M2_SPD_PIN, mspeed);
+// 			break;
+// 		case Direction::BACKWARDS:
+// 			digitalWrite(M2_FWD_PIN, HIGH);
+// 			digitalWrite(M2_BACK_PIN, LOW);
+// 			analogWrite(M2_SPD_PIN, mspeed);
+// 			break;
+// 		case Direction::STOP:
+// 			digitalWrite(M2_FWD_PIN, LOW);
+// 			digitalWrite(M2_BACK_PIN, LOW);
+// 			analogWrite(M2_SPD_PIN, 0);
+// 			break;
+// 	}
+// }
 
-void set_motor_r(const Direction& dir, const int& mspeed) 
-{
-	switch(dir)
-	{
-		case Direction::FORWARDS:
-			digitalWrite(M1_BACK_PIN, LOW);
-			digitalWrite(M1_FWD_PIN, HIGH);
-			analogWrite(M1_SPD_PIN, mspeed);
-			break;
-		case Direction::BACKWARDS:
-			digitalWrite(M1_FWD_PIN, LOW);
-			digitalWrite(M1_BACK_PIN, HIGH);
-			analogWrite(M1_SPD_PIN, mspeed);
-			break;
-		case Direction::STOP:
-			analogWrite(M1_SPD_PIN, 0);
-			digitalWrite(M1_FWD_PIN, LOW);
-			digitalWrite(M1_BACK_PIN, LOW);
-			break;
-	}
-}
+// void set_motor_r(const Direction& dir, const int& mspeed) 
+// {
+// 	switch(dir)
+// 	{
+// 		case Direction::FORWARDS:
+// 			digitalWrite(M1_BACK_PIN, LOW);
+// 			digitalWrite(M1_FWD_PIN, HIGH);
+// 			analogWrite(M1_SPD_PIN, mspeed);
+// 			break;
+// 		case Direction::BACKWARDS:
+// 			digitalWrite(M1_FWD_PIN, LOW);
+// 			digitalWrite(M1_BACK_PIN, HIGH);
+// 			analogWrite(M1_SPD_PIN, mspeed);
+// 			break;
+// 		case Direction::STOP:
+// 			analogWrite(M1_SPD_PIN, 0);
+// 			digitalWrite(M1_FWD_PIN, LOW);
+// 			digitalWrite(M1_BACK_PIN, LOW);
+// 			break;
+// 	}
+// }
 
-void set_motor_l_pulse_dir(int dir, int mspeed) {
-    if (dir == FORWARDS) {
-        digitalWrite(M2_FWD_PIN, LOW);
-        digitalWrite(M2_SPD_PIN, HIGH);
-        analogWrite(M2_BACK_PIN, mspeed);
-    } else if (dir == BACKWARDS) {
-        digitalWrite(M2_BACK_PIN, LOW);
-        digitalWrite(M2_SPD_PIN, HIGH);
-        analogWrite(M2_FWD_PIN, mspeed);
-    } else if (dir == STOP) {
-        digitalWrite(M2_FWD_PIN, LOW);
-        digitalWrite(M2_BACK_PIN, LOW);
-        analogWrite(M2_SPD_PIN, 0);
-    } else {
-        //incorrect direction given
-#ifdef DEBUG
-        //TODO: Blink some LED's
-#endif
+// void set_motor_l_pulse_dir(int dir, int mspeed) {
+//     if (dir == FORWARDS) {
+//         digitalWrite(M2_FWD_PIN, LOW);
+//         digitalWrite(M2_SPD_PIN, HIGH);
+//         analogWrite(M2_BACK_PIN, mspeed);
+//     } else if (dir == BACKWARDS) {
+//         digitalWrite(M2_BACK_PIN, LOW);
+//         digitalWrite(M2_SPD_PIN, HIGH);
+//         analogWrite(M2_FWD_PIN, mspeed);
+//     } else if (dir == STOP) {
+//         digitalWrite(M2_FWD_PIN, LOW);
+//         digitalWrite(M2_BACK_PIN, LOW);
+//         analogWrite(M2_SPD_PIN, 0);
+//     } else {
+//         //incorrect direction given
+// #ifdef DEBUG
+//         //TODO: Blink some LED's
+// #endif
 
-    }
-}
+//     }
+// }
 
-void set_motor_r_pulse_dir(int dir, int mspeed) {
-    if (dir == FORWARDS) {
+// void set_motor_r_pulse_dir(int dir, int mspeed) {
+//     if (dir == FORWARDS) {
 
-        digitalWrite(M1_BACK_PIN, LOW);
-        digitalWrite(M1_SPD_PIN, HIGH);
-        analogWrite(M1_FWD_PIN, mspeed);
-    } else if (dir == BACKWARDS) {
-        digitalWrite(M1_FWD_PIN, LOW);
-        digitalWrite(M1_SPD_PIN, HIGH);
-        analogWrite(M1_BACK_PIN, mspeed);
-    } else if (dir == STOP) {
-        analogWrite(M1_SPD_PIN, 0);
-        digitalWrite(M1_FWD_PIN, LOW);
-        digitalWrite(M1_BACK_PIN, LOW);
+//         digitalWrite(M1_BACK_PIN, LOW);
+//         digitalWrite(M1_SPD_PIN, HIGH);
+//         analogWrite(M1_FWD_PIN, mspeed);
+//     } else if (dir == BACKWARDS) {
+//         digitalWrite(M1_FWD_PIN, LOW);
+//         digitalWrite(M1_SPD_PIN, HIGH);
+//         analogWrite(M1_BACK_PIN, mspeed);
+//     } else if (dir == STOP) {
+//         analogWrite(M1_SPD_PIN, 0);
+//         digitalWrite(M1_FWD_PIN, LOW);
+//         digitalWrite(M1_BACK_PIN, LOW);
 
-    } else {
-        //incorrect direction given
-    }
-}
-
-
+//     } else {
+//         //incorrect direction given
+//     }
+// }
 
 
-void rst_enc_a_l_count() {
-  enc_a_l_count = 0;
-}
 
-void rst_enc_b_l_count() {
-  enc_b_l_count = 0;
-}
 
-void rst_enc_a_r_count() {
-  enc_a_r_count = 0;
-}
+// void rst_enc_a_l_count() {
+//   enc_a_l_count = 0;
+// }
 
-void rst_enc_b_r_count() {
-  // enc_a_l_count = 0;
-  enc_b_r_count = 0;
-}
+// void rst_enc_b_l_count() {
+//   enc_b_l_count = 0;
+// }
+
+// void rst_enc_a_r_count() {
+//   enc_a_r_count = 0;
+// }
+
+// void rst_enc_b_r_count() {
+//   // enc_a_l_count = 0;
+//   enc_b_r_count = 0;
+// }
 
 
 // void set_buzzer_on(){
@@ -274,27 +279,38 @@ void rst_enc_b_r_count() {
 // }
 
 
-int last_spd;
+// int last_spd;
 
 void loop()
 {
   // 0 is fwd, 1 is backward, 2 is stop
 
-  set_motor_l(FORWARDS, 100);
-  set_motor_r(BACKWARDS, 100);
+	mm.setMotorL(FORWARDS, 100);
+	mm.setMotorR(FORWARDS, 100);
+//   set_motor_l(FORWARDS, 100);
+//   set_motor_r(BACKWARDS, 100);
+	if (mm.enc_a_l_val() == 197 || mm.enc_b_l_val() == 197)
+	{
+		mm.setMotorL(STOP, 0);
+		mm.setMotorR(STOP, 0);
 
-  if (enc_a_l_count == 197 || enc_b_l_count == 197)
-  {
-    set_motor_l(STOP, 0);
-    set_motor_r(STOP, 0);
+		mm.rstAllEncCounters();
 
-    rst_enc_a_l_count();
-    rst_enc_b_l_count();
+		delay(2500);
+	}
 
-    rst_enc_a_r_count();
-    rst_enc_b_r_count();
-    delay(2500);
-  }
+//   if (enc_a_l_count == 197 || enc_b_l_count == 197)
+//   {
+//     set_motor_l(STOP, 0);
+//     set_motor_r(STOP, 0);
+
+//     rst_enc_a_l_count();
+//     rst_enc_b_l_count();
+
+//     rst_enc_a_r_count();
+//     rst_enc_b_r_count();
+//     delay(2500);
+//   }
   // delay(2500);
   // set_motor_l(0, 100);
   // Serial.println("Motor left one!");
