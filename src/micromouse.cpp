@@ -5,18 +5,13 @@
 
 namespace
 {
-    constexpr bool DEBUG_MODE = 0;
+    constexpr bool DEBUG_MODE = 1;
 }
 
-MicroMouse::MicroMouse(const unsigned int& enc_a_l, const unsigned int& enc_b_l,
-    const unsigned int& enc_a_r, const unsigned int& enc_b_r)
-{
-    // Initialize all variables necessary for micromouse operations.
-    enc_a_l_count = enc_a_l;
-    enc_b_l_count = enc_b_l;
-    enc_a_r_count = enc_a_r;
-    enc_b_r_count = enc_b_r;
-}
+unsigned int MicroMouse::enc_a_l_count = 0;
+unsigned int MicroMouse::enc_b_l_count = 0;
+unsigned int MicroMouse::enc_a_r_count = 0;
+unsigned int MicroMouse::enc_b_r_count = 0;
 
 void MicroMouse::initConnections()
 {

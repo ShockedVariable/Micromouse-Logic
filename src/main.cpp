@@ -30,7 +30,8 @@
 //   Serial.print("ENCBR: ");
 //   Serial.println(enc_b_r_count);
 // }
-MicroMouse mm{0, 0, 0, 0};
+MicroMouse mm;
+
 
 void setup() 
 {

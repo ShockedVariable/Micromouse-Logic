@@ -10,10 +10,6 @@ class MicroMouse
 public:
     // BEGIN INITIALIZATION FUNCTIONS
 
-    // The constructor's job is to initialize the private variables.
-    MicroMouse(const unsigned int& enc_a_l, const unsigned int& enc_b_l,
-            const unsigned int& enc_a_r, const unsigned int& enc_b_r);
-
     // The job of this function is to initialize all the interal connections
     // from the teensy to all other components in the micromouse.
     void initConnections();
@@ -132,6 +128,8 @@ public:
     For more information (and a solution for a workaround):
     https://arduino.stackexchange.com/questions/73287/interrupts-inside-a-class-attaching-to-the-function-of-the-class
     https://www.gammon.com.au/forum/?id=12983
+
+    The current implementation DOES NOT use this workaround but instead uses statics.
     */
 
     // The main job of this function is to increment our left enc_a and enc_b counters
