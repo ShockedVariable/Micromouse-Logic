@@ -1,10 +1,6 @@
 #include <Arduino.h>
+#include "directions.hpp"
 #include "pins.hpp"
-
-enum Direction 
-{
-  FORWARDS = 0, BACKWARDS = 1, STOP = 2
-};
 
 void enc_a_l_intr_handler() 
 {
