@@ -1,10 +1,12 @@
 #include <Arduino.h>
+#include <PID_v1.h>
 #include "directions.hpp"
 #include "micromouse.hpp"
 #include "pins.hpp"
 
 namespace
 {
+    // Turns on or off debug mode for printing to serial monitor.
     constexpr bool DEBUG_MODE = 1;
 }
 
@@ -18,7 +20,7 @@ void MicroMouse::initConnections()
     // Setting baud rate.
     Serial.begin(9600);
 
-    // Documentations goes here.
+    // Emitter pins are set to output.
     pinMode(EMIT_L_PIN, OUTPUT);
     pinMode(EMIT_R_PIN, OUTPUT);
     pinMode(EMIT_FL_PIN, OUTPUT);
@@ -30,22 +32,23 @@ void MicroMouse::initConnections()
     pinMode(RECEIVER_FL_PIN, INPUT);
     pinMode(RECEIVER_FR_PIN, INPUT);
 
-    // Documentations goes here.
+    // Motor 1 pins are set to output
     pinMode(M1_BACK_PIN, OUTPUT);
     pinMode(M1_FWD_PIN, OUTPUT);
     pinMode(M1_SPD_PIN, OUTPUT);
     pinMode(M1_ENC_A_PIN, INPUT); //check if input pullup
     pinMode(M1_ENC_B_PIN, INPUT);
 
-    // Documentations goes here.
+    // Motor 2 pins are set to output
     pinMode(M2_BACK_PIN, OUTPUT);
     pinMode(M2_FWD_PIN, OUTPUT);
     pinMode(M2_SPD_PIN, OUTPUT);
     pinMode(M2_ENC_A_PIN, INPUT); //check if input pullup
     pinMode(M2_ENC_B_PIN, INPUT);
 
-    // Documentations goes here.
+    // Buzzer pin is set to output
     pinMode(BUZZ_PIN, OUTPUT);
+    
     pinMode(SW_1_PIN, INPUT);
 }
 
@@ -65,8 +68,8 @@ void MicroMouse::enc_a_l_intr_handler()
 
     if (DEBUG_MODE)
     {
-        Serial.print("ENCAL: ");
-        Serial.println(enc_a_l_count);
+        // Serial.print("ENCAL: ");
+        // Serial.println(enc_a_l_count);
     }
 
 }
@@ -77,8 +80,8 @@ void MicroMouse::enc_b_l_intr_handler()
 
     if (DEBUG_MODE)
     {
-        Serial.print("ENCBL: ");
-        Serial.println(enc_b_l_count);
+        // Serial.print("ENCBL: ");
+        // Serial.println(enc_b_l_count);
     }
     
 }
@@ -89,8 +92,8 @@ void MicroMouse::enc_a_r_intr_handler()
 
     if (DEBUG_MODE)
     {
-        Serial.print("ENCAR: ");
-        Serial.println(enc_a_r_count);
+        // Serial.print("ENCAR: ");
+        // Serial.println(enc_a_r_count);
     }
     
 }
@@ -101,8 +104,8 @@ void MicroMouse::enc_b_r_intr_handler()
 
     if (DEBUG_MODE)
     {
-        Serial.print("ENCBR: ");
-        Serial.println(enc_b_r_count);
+        // Serial.print("ENCBR: ");
+        // Serial.println(enc_b_r_count);
     }
     
 }
@@ -236,7 +239,7 @@ void MicroMouse::setMotorR(const Direction& dir, const int& mspeed)
 			break;
 	}
 }
-
+// TODO: figure out what this function does 
 void MicroMouse::setMotorLPulseDir(const Direction& dir, const int& mspeed)
 {
     switch(dir)
@@ -244,6 +247,7 @@ void MicroMouse::setMotorLPulseDir(const Direction& dir, const int& mspeed)
         case Direction::FORWARDS:
             digitalWrite(M2_FWD_PIN, LOW);
             digitalWrite(M2_SPD_PIN, HIGH);
+            // Why are we pwming the back pin.
             analogWrite(M2_BACK_PIN, mspeed);
             break;
         case Direction::BACKWARDS:
@@ -328,4 +332,43 @@ void MicroMouse::rstAllEncCounters()
     rst_enc_a_r_counter();
     rst_enc_b_l_counter();
     rst_enc_b_r_counter();
+}
+#define DEBUG 1
+void MicroMouse::goForward(const int& blocks)
+{
+    const unsigned int one_cell = 197;
+    const unsigned int ticks_to_move = one_cell * blocks;
+    double ip, op, setp;
+    
+    rstAllEncCounters();
+    ip = enc_a_l_count - enc_a_r_count;
+    op = 0.0;
+    setp = 0.0;
+    PID t{&ip, &op, &setp, 16.0, 1.0, 4.0, DIRECT};
+    t.SetMode(AUTOMATIC);
+    t.SetSampleTime(5);
+
+    while (enc_a_l_val() <= ticks_to_move && enc_b_l_val() <= ticks_to_move){
+        ip = enc_a_l_val() - enc_a_r_val();
+        if(t.Compute()){
+            Serial.println("Adjusted speed");
+            if(op >0) {
+                setMotorL(FORWARDS, 100 + op);
+            } else if (op < 0) {
+                setMotorR(FORWARDS, 100 - op);
+            }
+        }
+        
+#ifdef DEBUG
+Serial.println("Moving!");
+Serial.printf("Left encoder: %d\n", enc_a_l_val());
+Serial.printf("Right encoder: %d\n", enc_a_r_val());
+#endif
+    }
+    Serial.println(enc_a_l_val());
+    Serial.println(enc_a_r_val());
+    rstAllEncCounters();
+    setMotorL(STOP, 0);
+    setMotorR(STOP, 0);
+    
 }

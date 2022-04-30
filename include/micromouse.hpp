@@ -13,12 +13,18 @@ public:
     // The job of this function is to initialize all the interal connections
     // from the teensy to all other components in the micromouse.
     void initConnections();
-
+	
     // During interrupts, we know the encoder ticked hence we need to increment
     // our counters.
     void attachInterrupts();
 
     // END INITIALIZATION FUNCTIONS
+
+	
+	// BEGIN MOVEMENT FUNCTIONS
+
+	// stuff
+	void goForward(const int& blocks);
 
 
     // BEGIN DISTANCE FUNCTIONS
@@ -54,6 +60,11 @@ public:
 
     // END SET MOTOR FUNCTIONS
 
+	/*
+	We have pins A and B on the encoder to determine whether the encoder is going forward or backwards.
+	If in the serial monitor we see ENCA first, we know that we are moving backwards. If
+	in the serial monitor we see ENCB first, we know that we are moving forwards.
+	*/
 
     // BEGIN GET ENCODER COUNTER FUNCTIONS
 
