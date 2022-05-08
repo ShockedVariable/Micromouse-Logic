@@ -4,12 +4,19 @@
 #include "micromouse.hpp"
 #include "pins.hpp"
 
-namespace
-{
-    // Turns on or off debug mode for printing to serial monitor.
-    constexpr bool DEBUG_MODE = 1;
-}
+#define DEBUG 1
+#define DEBUG_HANDLER 0
+// namespace
+// {
+//     // Turns on or off debug mode for printing to serial monitor.
+//     constexpr bool DEBUG_MODE = 1;
+// }
 
+// double r_ip, r_op, r_setp;
+// PID t{&r_ip, &r_op, &r_setp, 16.0, 1.0, 4.0, DIRECT};
+
+// By-product of using static member variables. Could this be implemented better? Check note in header file.
+// For now, it works fine as long as we do not instanitate another MicroMouse object.
 unsigned int MicroMouse::enc_a_l_count = 0;
 unsigned int MicroMouse::enc_b_l_count = 0;
 unsigned int MicroMouse::enc_a_r_count = 0;
@@ -66,11 +73,15 @@ void MicroMouse::enc_a_l_intr_handler()
 {
     ++enc_a_l_count;
 
-    if (DEBUG_MODE)
-    {
-        // Serial.print("ENCAL: ");
-        // Serial.println(enc_a_l_count);
-    }
+    #ifndef DEBUG_HANDLER
+    Serial.printf("ENCAL: %d\n", enc_a_l_count);
+    #endif
+
+    // if (DEBUG_MODE)
+    // {
+    //     // Serial.print("ENCAL: ");
+    //     // Serial.println(enc_a_l_count);
+    // }
 
 }
 
@@ -78,11 +89,14 @@ void MicroMouse::enc_b_l_intr_handler()
 {
     ++enc_b_l_count;
 
-    if (DEBUG_MODE)
-    {
-        // Serial.print("ENCBL: ");
-        // Serial.println(enc_b_l_count);
-    }
+    #ifndef DEBUG_HANDLER
+    Serial.printf("ENCBL: %d\n", enc_b_l_count);
+    #endif
+    // if (DEBUG_MODE)
+    // {
+    //     // Serial.print("ENCBL: ");
+    //     // Serial.println(enc_b_l_count);
+    // }
     
 }
 
@@ -90,11 +104,14 @@ void MicroMouse::enc_a_r_intr_handler()
 {
     ++enc_a_r_count;
 
-    if (DEBUG_MODE)
-    {
-        // Serial.print("ENCAR: ");
-        // Serial.println(enc_a_r_count);
-    }
+    #ifndef DEBUG_HANDLER
+    Serial.printf("ENCAR: %d\n", enc_a_r_count);
+    #endif
+    // if (DEBUG_MODE)
+    // {
+    //     // Serial.print("ENCAR: ");
+    //     // Serial.println(enc_a_r_count);
+    // }
     
 }
 
@@ -102,11 +119,15 @@ void MicroMouse::enc_b_r_intr_handler()
 {
     ++enc_b_r_count;
 
-    if (DEBUG_MODE)
-    {
-        // Serial.print("ENCBR: ");
-        // Serial.println(enc_b_r_count);
-    }
+    #ifndef DEBUG_HANDLER
+    Serial.printf("ENCBR: %d\n", enc_b_r_count);
+    #endif
+
+    // if (DEBUG_MODE)
+    // {
+    //     // Serial.print("ENCBR: ");
+    //     // Serial.println(enc_b_r_count);
+    // }
     
 }
 
@@ -117,9 +138,11 @@ int MicroMouse::getDistL()
     // Turns on the emitter, wait for some time, read the numbers reported and store.
     // Turns off the emitter after storing.
     digitalWrite(EMIT_L_PIN, HIGH);
+    // analogWrite(EMIT_L_PIN, 220);
     delay(EMITTER_ON_TIME);
     dist = analogRead(RECEIVER_L_PIN);
     digitalWrite(EMIT_L_PIN, LOW);
+    // analogWrite(EMIT_L_PIN, 0);
 
     return dist;
 }
@@ -131,9 +154,11 @@ int MicroMouse::getDistR()
     // Turns on the emitter, wait for some time, read the numbers reported and store.
     // Turns off the emitter after storing.
     digitalWrite(EMIT_R_PIN, HIGH);
+    // analogWrite(EMIT_R_PIN, 240);
     delay(EMITTER_ON_TIME);
     dist = analogRead(RECEIVER_R_PIN);
     digitalWrite(EMIT_R_PIN, LOW);
+    // analogWrite(EMIT_R_PIN, 0);
 
     return dist;
 }
@@ -333,42 +358,58 @@ void MicroMouse::rstAllEncCounters()
     rst_enc_b_l_counter();
     rst_enc_b_r_counter();
 }
-#define DEBUG 1
+
 void MicroMouse::goForward(const int& blocks)
 {
     const unsigned int one_cell = 197;
     const unsigned int ticks_to_move = one_cell * blocks;
-    double ip, op, setp;
+    int oldErrorP = 0, errorP = 0, errorD = 0;
+    
     
     rstAllEncCounters();
-    ip = enc_a_l_count - enc_a_r_count;
-    op = 0.0;
-    setp = 0.0;
-    PID t{&ip, &op, &setp, 16.0, 1.0, 4.0, DIRECT};
-    t.SetMode(AUTOMATIC);
-    t.SetSampleTime(5);
+    // ip = enc_a_l_count - enc_a_r_count;
+    // op = 0.0;
+    // setp = 0.0;
+    // PID t{&ip, &op, &setp, 16.0, 1.0, 4.0, DIRECT};
+    // t.SetMode(AUTOMATIC);
+    // t.SetSampleTime(5);
+    setMotorL(FORWARDS, 106);
+    setMotorR(FORWARDS, 100);
+    int totalError = 0;
+    const int P = 2;
+    const int D = 1;
 
-    while (enc_a_l_val() <= ticks_to_move && enc_b_l_val() <= ticks_to_move){
-        ip = enc_a_l_val() - enc_a_r_val();
-        if(t.Compute()){
-            Serial.println("Adjusted speed");
-            if(op >0) {
-                setMotorL(FORWARDS, 100 + op);
-            } else if (op < 0) {
-                setMotorR(FORWARDS, 100 - op);
-            }
+    while (enc_a_l_val() <= ticks_to_move || enc_b_l_val() <= ticks_to_move)
+    {
+        oldErrorP = errorP;
+        errorP = enc_a_r_count - enc_a_l_count;
+        errorD = errorP - oldErrorP;
+        totalError = P *errorP + D* errorD;
+        if(totalError > 30) {
+            totalError = 30;
+        } else if (totalError < -30) {
+            totalError = -30;
         }
-        
-#ifdef DEBUG
-Serial.println("Moving!");
-Serial.printf("Left encoder: %d\n", enc_a_l_val());
-Serial.printf("Right encoder: %d\n", enc_a_r_val());
-#endif
+        setMotorL(FORWARDS, 106 - totalError);
+        // setMotorR(FORWARDS, 100 + totalError);
+
+        Serial.println(totalError);
+        #ifdef DEBUG
+        Serial.println("Moving!");
+        Serial.printf("Left encoder: %d\n", enc_a_l_val());
+        Serial.printf("Right encoder: %d\n", enc_a_r_val());
+        #endif
     }
-    Serial.println(enc_a_l_val());
-    Serial.println(enc_a_r_val());
-    rstAllEncCounters();
+
     setMotorL(STOP, 0);
     setMotorR(STOP, 0);
+        
+    
+    // }
+//     Serial.println(enc_a_l_val());
+//     Serial.println(enc_a_r_val());
+//     rstAllEncCounters();
+//     setMotorL(STOP, 0);
+//     setMotorR(STOP, 0);
     
 }

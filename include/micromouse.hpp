@@ -1,9 +1,7 @@
 #ifndef micromouse_hpp
 #define micromouse_hpp
 
-#include <Arduino.h>
 #include "directions.hpp"
-#include "pins.hpp"
 
 class MicroMouse
 {

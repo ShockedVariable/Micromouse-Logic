@@ -15,31 +15,50 @@ void setup()
 	delay(2000);
 }
 
-
-//no resistance, battery full charge
-//160 measures about 6v
-//150 measure about 6v
-//140 measure about 5.9v
-
-//reccomend 
-
-//Ran with motor limit 140, 
-//with motors maxed out, all emitters on, all leds on, (buzzer off), no resistance at wheels. it drew about 0.9A.
-
-
-
-// int last_spd;
-
 void loop()
 {
+	mm.goForward(3);
+
+	while (true){}
+	// unsigned short left_sensor = mm.getDistL();
+	// unsigned short right_sensor =  mm.getDistR();
+	// unsigned short f_left_sensor = mm.getDistFL();
+	// unsigned short f_right_sensor = mm.getDistFR();
+	// digitalWrite(EMIT_L_PIN, HIGH);
+	// digitalWrite(EMIT_R_PIN, HIGH);
+	// digitalWrite(EMIT_FR_PIN, HIGH);
+	// digitalWrite(EMIT_FL_PIN, HIGH);
+
+	// if (left_sensor > 50 )
+	// {
+	// 	Serial.printf("Left Sensor: %d\n", left_sensor);
+	// }
+	
+	// if (right_sensor > 50)
+	// {
+	// 	Serial.printf("Right Sensor: %d\n", right_sensor);
+	// }
+
+	// if (f_left_sensor > 50)
+	// {
+	// 	Serial.printf("Front Left Sensor: %d\n", f_left_sensor);
+	// }
+	
+	// if (f_right_sensor > -1)
+	// {
+	// 	Serial.printf("Right Sensor: %d\n", f_right_sensor);
+	// }
+	
+
+	
 	// mm.setMotorL(FORWARDS, 90);
 	// mm.setMotorR(FORWARDS, 90);
 	// mm.rstAllEncCounters();
 
-	mm.setMotorL(FORWARDS, 100);
-	mm.setMotorR(FORWARDS, 100);
+	// mm.setMotorL(FORWARDS, 100);
+	// mm.setMotorR(FORWARDS, 100);
 
-	mm.goForward(2);
+	// mm.goForward(2);
 	// while(true) {
 
 	// }
@@ -54,6 +73,16 @@ void loop()
 	// }
 }
 
+//no resistance, battery full charge
+//160 measures about 6v
+//150 measure about 6v
+//140 measure about 5.9v
+
+//reccomend 
+
+//Ran with motor limit 140, 
+//with motors maxed out, all emitters on, all leds on, (buzzer off), no resistance at wheels. it drew about 0.9A.
+
 
 //cell = 18 cm
 //cell gap = 1.2 cm
@@ -63,3 +92,7 @@ void loop()
 //
 //approx 197 ticks for to move one cell
 //approx 73 ticks to turn 90 degrees
+
+
+// calibriation tip: for the first couple of seconds
+// let the mouse remember what is the "center" as reference point 
