@@ -39,7 +39,7 @@
 
 // Documentations goes here.
 #define UPPER_MOTOR_LIMIT 140
-#define LOWER_MOTOR_LIMIT 30
+#define LOWER_MOTOR_LIMIT 105
 #define PID_POLLING_DELAY 15
 #define MOTOR_SWITCH_DIR_DELAY 0
 

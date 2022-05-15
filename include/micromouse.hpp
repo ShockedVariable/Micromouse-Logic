@@ -16,13 +16,19 @@ public:
     // our counters.
     void attachInterrupts();
 
+    // During setup phase of the micromouse, we find the center of the mouse relative to
+    // the right and left sensors by finding the difference between them.
+    void findCenter();
+
     // END INITIALIZATION FUNCTIONS
 
 	
 	// BEGIN MOVEMENT FUNCTIONS
 
-	// stuff
-	void goForward(const int& blocks);
+    // Makes the micromouse move forward.
+    void goForward(unsigned int& curr_time, const int& blocks);
+
+    // END MOVEMENT FUNCTIONS
 
 
     // BEGIN DISTANCE FUNCTIONS
@@ -39,7 +45,18 @@ public:
     // Returns the distance the front left emitter is receiving.
     int getDistFL();
 
+    // Returns the current recorded center of the micromouse.
+    int getCenter();
+
     // END DISTANCE FUNCTIONS
+
+
+    // BEGIN PID FUNCTION
+
+    // The PID function that calculates the changes for our motors.
+    int PID(const int& sensor_data, int& historal_err, const unsigned int& elapsed_time, int& prev_error);
+
+    // END PID FUNCTION
 
 
     // BEGIN SET MOTOR FUNCTIONS
@@ -57,6 +74,17 @@ public:
     void setMotorRPulseDir(const Direction& dir, const int& mspeed);
 
     // END SET MOTOR FUNCTIONS
+
+
+    // BEGIN TURN FUNCTIONS
+
+    // Makes the micromouse turn right.
+    void turnRight();
+
+    // Makes the micromouse turn left.
+    void turnLeft();
+
+    // END TURN FUNCTIONS
 
 	/*
 	We have pins A and B on the encoder to determine whether the encoder is going forward or backwards.
@@ -170,6 +198,8 @@ private:
     static unsigned int enc_a_r_count;
     static unsigned int enc_b_r_count;
 
+    // Stores the sensor reading of the mouse when placed in the center during setup.
+    static int center;
 };
 
 #endif
