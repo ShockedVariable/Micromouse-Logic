@@ -1,5 +1,4 @@
 #include <Arduino.h>
-#include <PID_v1.h>
 #include "directions.hpp"
 #include "micromouse.hpp"
 #include "pins.hpp"
@@ -28,26 +27,22 @@ void setup()
 
 	Serial7.printf("Center: %d\r\n", mm.getCenter());
 
-	t1.begin(inc, 100); // 100 microseconds
+	t1.begin(inc, 1); // 1 microsecond
 }
 
 void loop()
-{
-	mm.goForward(curr_time, 5);
-	delay(1000);
-	mm.turnLeft();
-	delay(1000);
-	mm.turnRight();
+{	
+	mm.goForward(curr_time, 4);
+	// delay(1000);
+	// mm.turnLeft();
+	// delay(1000);
+	// mm.turnRight();
 
 	while (true);
 	// unsigned short left_sensor = mm.getDistL();
 	// unsigned short right_sensor = mm.getDistR();
 	// unsigned short f_left_sensor = mm.getDistFL();
 	// unsigned short f_right_sensor = mm.getDistFR();
-	// digitalWrite(EMIT_L_PIN, HIGH);
-	// digitalWrite(EMIT_R_PIN, HIGH);
-	// digitalWrite(EMIT_FR_PIN, HIGH);
-	// digitalWrite(EMIT_FL_PIN, HIGH);
 
 	// if (left_sensor > -1)
 	// {
@@ -71,9 +66,6 @@ void loop()
 	// 	Serial.printf("Right Sensor: %d\n", f_right_sensor);
 	// 	Serial7.printf("Right Sensor: %d\n", f_right_sensor);
 	// }
-	
-
-	
 }
 
 //no resistance, battery full charge

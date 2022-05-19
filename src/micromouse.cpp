@@ -5,7 +5,6 @@
 #include "pins.hpp"
 
 #define DEBUG 1
-#define DEBUG_HANDLER 0
 
 // By-product of using static member variables. Could this be implemented better? Check note in header file.
 // For now, it works fine as long as we do not instanitate another MicroMouse object.
@@ -13,20 +12,25 @@ unsigned int MicroMouse::enc_a_l_count = 0;
 unsigned int MicroMouse::enc_b_l_count = 0;
 unsigned int MicroMouse::enc_a_r_count = 0;
 unsigned int MicroMouse::enc_b_r_count = 0;
+int MicroMouse::center = 0;
 
 const unsigned int ticks_to_move = 169;
 const unsigned int turn_ticks = 85;
 
 // const float k_p = 0.0125;
 const float k_p = 0.015;
+// const float k_p = 0.05;
+// const float k_p = 0.2;
+// const float k_p = 0.9;
 const float k_i = 0;
-const float k_d = 0;
+const float k_d = 0.03;
 
 const int l_spd_motor = 105;
 const int r_spd_motor = 105;
 
 // This is corralated to how often we increment our timer back in main.cpp.
-const unsigned short SAMPLE_RATE = 10;
+// Currently sampling every 1 ms.
+const unsigned short SAMPLE_RATE = 1000;
 
 void MicroMouse::initConnections()
 {
@@ -97,6 +101,7 @@ int MicroMouse::PID(const int& sensor_data, int& historal_err, const unsigned in
     int error_delta = error - prev_error;
 
     Serial7.printf("Error: %d\r\n", error);
+    Serial7.printf("Error Delta: %d\r\n", error_delta);
 
     // The proportional part required for P in PID which is the actual value.
     int p_error = k_p * error;
@@ -119,37 +124,21 @@ int MicroMouse::PID(const int& sensor_data, int& historal_err, const unsigned in
 void MicroMouse::enc_a_l_intr_handler()
 {
     ++enc_a_l_count;
-
-    #ifndef DEBUG_HANDLER
-    Serial.printf("ENCAL: %d\n", enc_a_l_count);
-    #endif
 }
 
 void MicroMouse::enc_b_l_intr_handler()
 {
     ++enc_b_l_count;
-
-    #ifndef DEBUG_HANDLER
-    Serial.printf("ENCBL: %d\n", enc_b_l_count);
-    #endif
 }
 
 void MicroMouse::enc_a_r_intr_handler()
 {
     ++enc_a_r_count;
-
-    #ifndef DEBUG_HANDLER
-    Serial.printf("ENCAR: %d\n", enc_a_r_count);
-    #endif
 }
 
 void MicroMouse::enc_b_r_intr_handler()
 {
     ++enc_b_r_count;
-
-    #ifndef DEBUG_HANDLER
-    Serial.printf("ENCBR: %d\n", enc_b_r_count);
-    #endif 
 }
 
 int MicroMouse::getDistL()
@@ -240,22 +229,22 @@ void MicroMouse::turnAllLedOff()
 }
 
 void MicroMouse::setMotorL(const Direction& dir, const int& mspeed)
-{
+{    
     switch(dir)
 	{
 		case Direction::FORWARDS:
-			digitalWrite(M2_FWD_PIN, LOW);
-			digitalWrite(M2_BACK_PIN, HIGH);
+			digitalWriteFast(M2_FWD_PIN, LOW);
+			digitalWriteFast(M2_BACK_PIN, HIGH);
 			analogWrite(M2_SPD_PIN, mspeed);
 			break;
 		case Direction::BACKWARDS:
-			digitalWrite(M2_FWD_PIN, HIGH);
-			digitalWrite(M2_BACK_PIN, LOW);
+			digitalWriteFast(M2_FWD_PIN, HIGH);
+			digitalWriteFast(M2_BACK_PIN, LOW);
 			analogWrite(M2_SPD_PIN, mspeed);
 			break;
 		case Direction::STOP:
-			digitalWrite(M2_FWD_PIN, LOW);
-			digitalWrite(M2_BACK_PIN, LOW);
+			digitalWriteFast(M2_FWD_PIN, LOW);
+			digitalWriteFast(M2_BACK_PIN, LOW);
 			analogWrite(M2_SPD_PIN, 0);
 			break;
 	}
@@ -266,19 +255,19 @@ void MicroMouse::setMotorR(const Direction& dir, const int& mspeed)
     switch(dir)
 	{
 		case Direction::FORWARDS:
-			digitalWrite(M1_BACK_PIN, LOW);
-			digitalWrite(M1_FWD_PIN, HIGH);
+			digitalWriteFast(M1_BACK_PIN, LOW);
+			digitalWriteFast(M1_FWD_PIN, HIGH);
 			analogWrite(M1_SPD_PIN, mspeed);
 			break;
 		case Direction::BACKWARDS:
-			digitalWrite(M1_FWD_PIN, LOW);
-			digitalWrite(M1_BACK_PIN, HIGH);
+			digitalWriteFast(M1_FWD_PIN, LOW);
+			digitalWriteFast(M1_BACK_PIN, HIGH);
 			analogWrite(M1_SPD_PIN, mspeed);
 			break;
 		case Direction::STOP:
-			analogWrite(M1_SPD_PIN, 0);
-			digitalWrite(M1_FWD_PIN, LOW);
-			digitalWrite(M1_BACK_PIN, LOW);
+			digitalWriteFast(M1_FWD_PIN, LOW);
+			digitalWriteFast(M1_BACK_PIN, LOW);
+            analogWrite(M1_SPD_PIN, 0);
 			break;
 	}
 }
@@ -379,6 +368,10 @@ void MicroMouse::rstAllEncCounters()
 
 void MicroMouse::goForward(unsigned int& curr_time, const int& blocks)
 {
+    setMotorL(FORWARDS, l_spd_motor);
+    setMotorR(FORWARDS, 0);
+    setMotorR(FORWARDS, r_spd_motor);
+
     unsigned int time = curr_time;
 
     int hist_error = 0;
@@ -386,23 +379,26 @@ void MicroMouse::goForward(unsigned int& curr_time, const int& blocks)
     const unsigned int to_move = ticks_to_move * blocks;
 
     unsigned int b_l_val = enc_b_l_val();
+    unsigned int b_r_val = enc_b_r_val();
+
     int old_error = 0;
-    Serial7.printf("%d\r\n", b_l_val);
+    // Serial7.printf("%d\r\n", b_l_val);
 
-    while (b_l_val <= to_move)
+    while (b_l_val <= to_move || b_r_val <= to_move)
     {
-        setMotorL(FORWARDS, l_spd_motor);
-        setMotorR(FORWARDS, r_spd_motor);
-
-        // Serial7.printf("%d\r\n", b_l_val);
+        Serial7.printf("%d\r\n", b_l_val);
 
         if (curr_time - time >= SAMPLE_RATE)
         {
             const unsigned int elapsed_time = curr_time - time;
             time = curr_time;
 
-            int curr_delta_dist = getDistR() - getDistL();
+            int r = getDistR();
+            int l = getDistL();
+            int curr_delta_dist = r - l;
 
+            Serial7.printf("L Sensor Reading: %d\r\n", l);
+            Serial7.printf("R Sensor Reading: %d\r\n", r);
             Serial7.printf("Delta Sensor Reading: %d\r\n", curr_delta_dist);
 
             // Also known as the steer value.
@@ -415,12 +411,19 @@ void MicroMouse::goForward(unsigned int& curr_time, const int& blocks)
             {
                 new_l_spd_motor = UPPER_MOTOR_LIMIT;
             }
+            else if (new_l_spd_motor < 0)
+            {
+                new_l_spd_motor = 0;
+            }
 
             if (new_r_spd_motor > UPPER_MOTOR_LIMIT)
             {
                 new_r_spd_motor = UPPER_MOTOR_LIMIT;
             }
-
+            else if (new_r_spd_motor < 0)
+            {
+                new_r_spd_motor = 0;
+            }
             
             Serial7.printf("Steer: %d\r\n", pid_result);
             Serial7.printf("L Motor: %d\r\n", new_l_spd_motor);
@@ -431,6 +434,7 @@ void MicroMouse::goForward(unsigned int& curr_time, const int& blocks)
         }
 
         b_l_val = enc_b_l_val();
+        b_r_val = enc_b_r_val();
     }
 
     Serial7.printf("EXITED WHILE\r\n");
@@ -442,14 +446,17 @@ void MicroMouse::goForward(unsigned int& curr_time, const int& blocks)
 
 void MicroMouse::turnRight()
 {
+    setMotorL(FORWARDS, l_spd_motor);
+    setMotorR(BACKWARDS, 0);
+    setMotorR(BACKWARDS, r_spd_motor);
+
     unsigned int l_val = enc_b_l_val();
+    unsigned int r_val = enc_a_r_val();
 
-    while (l_val <= turn_ticks)
+    while (l_val <= turn_ticks || r_val <= turn_ticks)
     {
-        setMotorL(FORWARDS, l_spd_motor);
-        setMotorR(BACKWARDS, r_spd_motor);
-
         l_val = enc_b_l_val();
+        r_val = enc_a_r_val();
     }
 
     setMotorL(STOP, 0);
@@ -460,13 +467,16 @@ void MicroMouse::turnRight()
 
 void MicroMouse::turnLeft()
 {
+    setMotorL(BACKWARDS, l_spd_motor);
+    setMotorR(FORWARDS, 0);
+    setMotorR(FORWARDS, r_spd_motor);
+
+    unsigned int l_val = enc_a_l_val();
     unsigned int r_val = enc_b_r_val();
 
-    while (r_val <= turn_ticks)
+    while (r_val <= turn_ticks || l_val <= turn_ticks)
     {
-        setMotorL(BACKWARDS, l_spd_motor);
-        setMotorR(FORWARDS, r_spd_motor);
-
+        l_val = enc_a_l_val();
         r_val = enc_b_r_val();
     }
 
