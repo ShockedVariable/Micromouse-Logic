@@ -8,7 +8,7 @@
 
 // By-product of using static member variables. Could this be implemented better? Check note in header file.
 // For now, it works fine as long as we do not instanitate another MicroMouse object.
-unsigned int MicroMouse::enc_a_l_count = 0;
+volatile unsigned int MicroMouse::enc_a_l_count = 0;
 unsigned int MicroMouse::enc_b_l_count = 0;
 unsigned int MicroMouse::enc_a_r_count = 0;
 unsigned int MicroMouse::enc_b_r_count = 0;
@@ -472,14 +472,19 @@ void MicroMouse::turnLeft()
     setMotorR(FORWARDS, 0);
     setMotorR(FORWARDS, r_spd_motor);
 
-    unsigned int l_val = enc_a_l_val();
-    unsigned int r_val = enc_b_r_val();
+    // unsigned int l_val = enc_a_l_val();
+    // unsigned int r_val = enc_b_r_val();
 
-    while (r_val <= turn_ticks || l_val <= turn_ticks)
-    {
-        l_val = enc_a_l_val();
-        r_val = enc_b_r_val();
-    }
+    while (enc_a_l_count <= turn_ticks);
+
+    // while (l_val <= turn_ticks)
+    // {
+    //     // Serial7.printf("Function: %d\r\n", l_val);
+    //     // Serial7.printf("Direct: %d\r\n", enc_a_l_count);
+
+    //     l_val = enc_a_l_val();
+    //     // r_val = enc_b_r_val();
+    // }
 
     setMotorL(STOP, 0);
     setMotorR(STOP, 0);

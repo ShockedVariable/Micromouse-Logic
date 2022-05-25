@@ -186,7 +186,7 @@ private:
     the combination of these two allow us to tell if the encoder is
     moving forward or backwards.
     */
-    static unsigned int enc_a_l_count;
+    static volatile unsigned int enc_a_l_count;
     static unsigned int enc_b_l_count;
 
     /* 

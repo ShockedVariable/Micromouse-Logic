@@ -32,9 +32,14 @@ void setup()
 
 void loop()
 {	
-	mm.goForward(curr_time, 6);
-	// delay(1000);
-	// mm.turnLeft();
+
+	// for (unsigned char i = 0; i < 3; i++)
+	// {
+	// 	mm.goForward(curr_time, 1);
+	// }
+	mm.goForward(curr_time, 2);
+	delay(1000);
+	mm.turnLeft();
 	// delay(1000);
 	// mm.turnRight();
 
