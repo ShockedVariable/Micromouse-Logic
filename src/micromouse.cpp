@@ -384,9 +384,10 @@ void MicroMouse::goForward(unsigned int& curr_time, const int& blocks)
     int old_error = 0;
     // Serial7.printf("%d\r\n", b_l_val);
 
-    while (b_l_val <= to_move || b_r_val <= to_move)
+    while (b_l_val <= to_move)
     {
         Serial7.printf("%d\r\n", b_l_val);
+        Serial7.printf("%d\r\n", b_r_val);
 
         if (curr_time - time >= SAMPLE_RATE)
         {

@@ -32,7 +32,7 @@ void setup()
 
 void loop()
 {	
-	mm.goForward(curr_time, 4);
+	mm.goForward(curr_time, 6);
 	// delay(1000);
 	// mm.turnLeft();
 	// delay(1000);
@@ -46,14 +46,14 @@ void loop()
 
 	// if (left_sensor > -1)
 	// {
-	// 	// Serial.printf("Left Sensor: %d\n", left_sensor);
-	// 	Serial7.printf("Left Sensor: %d\n", left_sensor);
+	// 	Serial.printf("Left Sensor: %d\n", left_sensor);
+	// 	// Serial7.printf("Left Sensor: %d\n", left_sensor);
 	// }
 	
 	// if (right_sensor > -1)
 	// {
-	// 	// Serial.printf("Right Sensor: %d\n", right_sensor);
-	// 	Serial7.printf("Right Sensor: %d\n", right_sensor);
+	// 	Serial.printf("Right Sensor: %d\n", right_sensor);
+	// 	// Serial7.printf("Right Sensor: %d\n", right_sensor);
 	// }
 
 	// if (f_left_sensor > 50)
