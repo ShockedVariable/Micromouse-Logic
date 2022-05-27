@@ -20,44 +20,12 @@ void setup()
 
 void loop()
 {	
+	while (mm.getDistFR() < 900);
 
+	delay(1000);
 	mm.goForward(3);
-	// delay(1000);
-	// mm.turnLeft();
-	// delay(1000);
-	// mm.turnRight();
-	// Serial.printf("Left Encoder: %d\r\n", mm.enc_b_l_val());
-	// Serial.printf("Right Encoder: %d\r\n", mm.enc_b_r_val());
-
-	// delay(1000);
-	while (true);
-	// unsigned short left_sensor = mm.getDistL();
-	// unsigned short right_sensor = mm.getDistR();
-	// unsigned short f_left_sensor = mm.getDistFL();
-	// unsigned short f_right_sensor = mm.getDistFR();
-
-	// if (left_sensor > -1)
-	// {
-	// 	Serial.printf("Left Sensor: %d\n", left_sensor);
-	// 	// Serial7.printf("Left Sensor: %d\n", left_sensor);
-	// }
+	delay(2500);
 	
-	// if (right_sensor > -1)
-	// {
-	// 	Serial.printf("Right Sensor: %d\n", right_sensor);
-	// 	// Serial7.printf("Right Sensor: %d\n", right_sensor);
-	// }
-
-	// if (f_left_sensor > 50)
-	// {
-	// 	Serial.printf("Front Left Sensor: %d\n", f_left_sensor);
-	// }
-	
-	// if (f_right_sensor > -1)
-	// {
-	// 	Serial.printf("Right Sensor: %d\n", f_right_sensor);
-	// 	Serial7.printf("Right Sensor: %d\n", f_right_sensor);
-	// }
 }
 
 //no resistance, battery full charge

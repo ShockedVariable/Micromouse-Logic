@@ -33,6 +33,7 @@
 // Documentations goes here.
 #define BUZZ_PIN 2
 #define SW_1_PIN 13
+#define SW_2_PIN 10
 #define LED1_PIN 5
 #define LED2_PIN 3
 #define LED3_PIN 4
