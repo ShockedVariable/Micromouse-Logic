@@ -3,6 +3,12 @@
 
 #include "directions.hpp"
 
+struct Dists
+{
+    int r;
+    int l;
+};
+
 class MicroMouse
 {
 public:
@@ -10,11 +16,11 @@ public:
 
     // The job of this function is to initialize all the interal connections
     // from the teensy to all other components in the micromouse.
-    void initConnections();
+    static void initConnections();
 	
     // During interrupts, we know the encoder ticked hence we need to increment
     // our counters.
-    void attachInterrupts();
+    static void attachInterrupts();
 
     // During setup phase of the micromouse, we find the center of the mouse relative to
     // the right and left sensors by finding the difference between them.
@@ -34,38 +40,30 @@ public:
     // BEGIN DISTANCE FUNCTIONS
 
     // Returns the distance the left emitter is receiving.
-    int getDistL();
+    static int getDistL();
 
     // Returns the distance the right emitter is receiving.
-    int getDistR();
+    static int getDistR();
     
     // Returns the distance the front right emitter is receiving.
-    int getDistFR();
+    static int getDistFR();
 
     // Returns the distance the front left emitter is receiving.
-    int getDistFL();
+    static int getDistFL();
 
-    // Returns the current recorded center of the micromouse.
-    int getCenter();
+    // Returns a struct containing the distances read from the right and left emitters.
+    Dists getDistRL();
 
     // END DISTANCE FUNCTIONS
-
-
-    // BEGIN PID FUNCTION
-
-    // The PID function that calculates the changes for our motors.
-    int PID(const int& sensor_data, int& historal_err, const unsigned int& elapsed_time, int& prev_error);
-
-    // END PID FUNCTION
 
 
     // BEGIN SET MOTOR FUNCTIONS
 
     // Sets the left motor with a direction and speed.
-    void setMotorL(const Direction& dir, const int& mspeed);
+    static void setMotorL(const Direction& dir, const int& mspeed);
 
     // Sets the right motor with a direction and speed.
-    void setMotorR(const Direction& dir, const int& mspeed);
+    static void setMotorR(const Direction& dir, const int& mspeed);
 
     // Documentation goes here.
     void setMotorLPulseDir(const Direction& dir, const int& mspeed);
@@ -95,16 +93,16 @@ public:
     // BEGIN GET ENCODER COUNTER FUNCTIONS
 
     // Returns the current tick count of the left enc_a.
-    unsigned int enc_a_l_val();
+    unsigned int enc_backwards_l_val();
 
     // Returns the current tick count of the left enc_b.
-    unsigned int enc_b_l_val();
+    unsigned int enc_forwards_l_val();
 
     // Returns the current tick count of the right enc_a.
-    unsigned int enc_a_r_val();
+    unsigned int enc_backwards_r_val();
 
     // Returns the current tick count of the right enc_b.
-    unsigned int enc_b_r_val();
+    unsigned int enc_forwards_r_val();
 
     // END GET ENCODER COUNTER FUNCTIONS
 
@@ -112,16 +110,16 @@ public:
     // BEGIN RESET COUNTER FUNCTIONS
 
     // Resets the left counter for enc_a.
-    void rst_enc_a_l_counter();
+    void rst_enc_backwards_l_counter();
 
     // Resets the left counter for enc_b.
-    void rst_enc_b_l_counter();
+    void rst_enc_forwards_l_counter();
 
     // Resets the right counter for enc_a.
-    void rst_enc_a_r_counter();
+    void rst_enc_backwards_r_counter();
 
     // Resets the right counter for enc_b.
-    void rst_enc_b_r_counter();
+    void rst_enc_forwards_r_counter();
 
     // Resets all encoder counters.
     void rstAllEncCounters();
@@ -132,16 +130,16 @@ public:
     // BEGIN DEBUG FUNCTIONS
 
     // Turns all the emitters on.
-    void turnAllEmittersOn();
+    static void turnAllEmittersOn();
 
     // Turns all the emitters off.
-    void turnAllEmittersOff();
+    static void turnAllEmittersOff();
 
     // Turns all LEDs on.
-    void turnAllLedOn();
+    static void turnAllLedOn();
 
     // Turns all LEDs off.
-    void turnAllLedOff();
+    static void turnAllLedOff();
 
     // Turns on buzzer.
     void setBuzzerOn();
@@ -200,6 +198,18 @@ private:
 
     // Stores the sensor reading of the mouse when placed in the center during setup.
     static int center;
+
+    Dists _d;
+
+
+    // BEGIN PID FUNCTION
+
+    // The PID functions that calculates the changes for our motors.
+    int PID_IR(int& historal_err, const unsigned int& elapsed_time, int& prev_error);
+    int PID_enc(int& historal_err, const unsigned int& elapsed_time, int& prev_error);
+
+    // END PID FUNCTION
+
 };
 
 #endif

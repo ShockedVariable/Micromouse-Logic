@@ -21,11 +21,10 @@ void setup()
 	mm.findCenter();
 
 	delay(2000);
+	
 	// Serial7 is default for bluetooth module.
 	Serial7.begin(9600);
 	// delay(2500);
-
-	Serial7.printf("Center: %d\r\n", mm.getCenter());
 
 	t1.begin(inc, 1); // 1 microsecond
 }
@@ -33,7 +32,7 @@ void setup()
 void loop()
 {	
 
-	mm.goForward(curr_time, 1);
+	mm.goForward(curr_time, 3);
 	// delay(1000);
 	// mm.turnLeft();
 	// delay(1000);

@@ -38,8 +38,8 @@
 #define LED3_PIN 4
 
 // Documentations goes here.
-#define UPPER_MOTOR_LIMIT 140
-#define LOWER_MOTOR_LIMIT 105
+#define UPPER_MOTOR_LIMIT 160
+#define LOWER_MOTOR_LIMIT 95
 #define PID_POLLING_DELAY 15
 #define MOTOR_SWITCH_DIR_DELAY 0
 

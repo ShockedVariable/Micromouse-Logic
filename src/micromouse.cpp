@@ -17,16 +17,16 @@ int MicroMouse::center = 0;
 const unsigned int ticks_to_move = 169;
 const unsigned int turn_ticks = 85;
 
-// const float k_p = 0.0125;
-const float k_p = 0.015;
-// const float k_p = 0.05;
-// const float k_p = 0.2;
-// const float k_p = 0.9;
-const float k_i = 0;
-const float k_d = 0.03;
+const float k_p_enc = 0.5f;
+const float k_i_enc = 0.0f;
+const float k_d_enc = 0.01f;
 
-const int l_spd_motor = 105;
-const int r_spd_motor = 105;
+const float k_p_ir = 0.08f;
+const float k_i_ir = 0.0f;
+const float k_d_ir = 0.001f;
+
+const int l_spd_motor = 125;
+const int r_spd_motor = 125;
 
 // This is corralated to how often we increment our timer back in main.cpp.
 // Currently sampling every 1 ms.
@@ -81,42 +81,63 @@ void MicroMouse::attachInterrupts()
 
 void MicroMouse::findCenter()
 {
-    center = getDistR() - getDistL();
+    const Dists d = getDistRL();
+    center = d.r - d.l;
 }
 
-int MicroMouse::getCenter()
+int MicroMouse::PID_IR(int& historal_err, const unsigned int& elapsed_time, int& prev_error)
 {
-    return center;
-}
+    Dists d = getDistRL();
+    int sensor_delta = d.r - d.l;
 
-int MicroMouse::PID(const int& sensor_data, int& historal_err, const unsigned int& elapsed_time, int& prev_error)
-{   
     // The error needed for PID calculation. Based on only left and right sensors.
-    int error = getCenter() - sensor_data;
+    int error_ir = center - sensor_delta;
 
     // The integration required for I in PID. This approxmiates integrals by doing Riemann Sums.
-    historal_err += error * elapsed_time;
+    historal_err += error_ir * elapsed_time;
 
     // The derivative required for D in PID. This approxmiates the derivative by doing differences/deltas.
-    int error_delta = error - prev_error;
-
-    Serial7.printf("Error: %d\r\n", error);
-    Serial7.printf("Error Delta: %d\r\n", error_delta);
+    int error_ir_delta = error_ir - prev_error;
 
     // The proportional part required for P in PID which is the actual value.
-    int p_error = k_p * error;
+    int p_error_ir = k_p_ir * error_ir;
 
     // The actual I in PID.
-    int i_error = k_i * historal_err;
+    int i_error_ir = k_i_ir * historal_err;
 
     // The actual D in PID.
-    int d_error = k_d * error_delta;
+    int d_error_ir = k_d_ir * error_ir_delta;
 
-    int correction = p_error + i_error + d_error;
+    int correction = p_error_ir + i_error_ir + d_error_ir;
 
-    prev_error = error;
+    prev_error = error_ir;
 
-    Serial7.printf("Correcton: %d\r\n", correction);
+    return correction;
+}
+
+int MicroMouse::PID_enc(int& historal_err, const unsigned int& elapsed_time, int& prev_error)
+{
+    // The error needed for PID calculation. Based on only left and right encoders.
+    int error_enc = static_cast<int>(enc_forwards_r_count) - static_cast<int>(enc_forwards_l_count);
+
+    // The integration required for I in PID. This approxmiates integrals by doing Riemann Sums.
+    historal_err += error_enc * elapsed_time;
+
+    // The derivative required for D in PID. This approxmiates the derivative by doing differences/deltas.
+    int error_enc_delta = error_enc - prev_error;
+
+    // The proportional part required for P in PID which is the actual value.
+    int p_error_enc = k_p_enc * error_enc;
+    
+    // The actual I in PID.
+    int i_error_enc = k_i_enc * historal_err;
+
+    // The actual D in PID.
+    int d_error_enc = k_d_enc * error_enc_delta;
+
+    int correction = p_error_enc + i_error_enc + d_error_enc;
+
+    prev_error = error_enc;
 
     return correction;
 }
@@ -168,6 +189,18 @@ int MicroMouse::getDistR()
     digitalWrite(EMIT_R_PIN, LOW);
 
     return dist;
+}
+
+Dists MicroMouse::getDistRL()
+{
+    digitalWrite(EMIT_L_PIN, HIGH);
+    digitalWrite(EMIT_R_PIN, HIGH);
+    delay(EMITTER_ON_TIME);
+
+    _d.r = analogRead(RECEIVER_R_PIN);
+    _d.l = analogRead(RECEIVER_L_PIN);
+
+    return _d;
 }
 
 int MicroMouse::getDistFR()
@@ -318,52 +351,52 @@ void MicroMouse::setMotorRPulseDir(const Direction& dir, const int& mspeed)
     }
 }
 
-unsigned int MicroMouse::enc_a_l_val()
+unsigned int MicroMouse::enc_backwards_l_val()
 {
     return enc_backwards_l_count;
 }
 
-unsigned int MicroMouse::enc_b_l_val()
+unsigned int MicroMouse::enc_forwards_l_val()
 {
     return enc_forwards_l_count;
 }
 
-unsigned int MicroMouse::enc_a_r_val()
+unsigned int MicroMouse::enc_backwards_r_val()
 {
     return enc_backwards_r_count;
 }
 
-unsigned int MicroMouse::enc_b_r_val()
+unsigned int MicroMouse::enc_forwards_r_val()
 {
     return enc_forwards_r_count;
 }
 
-void MicroMouse::rst_enc_a_l_counter()
+void MicroMouse::rst_enc_backwards_l_counter()
 {
     enc_backwards_l_count = 0;
 }
 
-void MicroMouse::rst_enc_b_l_counter()
+void MicroMouse::rst_enc_forwards_l_counter()
 {
     enc_forwards_l_count = 0;
 }
 
-void MicroMouse::rst_enc_a_r_counter()
+void MicroMouse::rst_enc_backwards_r_counter()
 {
     enc_backwards_r_count = 0;
 }
 
-void MicroMouse::rst_enc_b_r_counter()
+void MicroMouse::rst_enc_forwards_r_counter()
 {
     enc_forwards_r_count = 0;
 }
 
 void MicroMouse::rstAllEncCounters()
 {
-    rst_enc_a_l_counter();
-    rst_enc_a_r_counter();
-    rst_enc_b_l_counter();
-    rst_enc_b_r_counter();
+    rst_enc_backwards_l_counter();
+    rst_enc_backwards_r_counter();
+    rst_enc_forwards_l_counter();
+    rst_enc_forwards_r_counter();
 }
 
 void MicroMouse::goForward(unsigned int& curr_time, const int& blocks)
@@ -373,12 +406,12 @@ void MicroMouse::goForward(unsigned int& curr_time, const int& blocks)
     setMotorR(FORWARDS, r_spd_motor);
 
     unsigned int time = curr_time;
-
-    int hist_error = 0;
-
     const unsigned int to_move = ticks_to_move * blocks;
 
-    int old_error = 0;
+    int old_error_ir = 0;
+    int old_error_enc = 0;
+    int hist_error_ir = 0;
+    int hist_error_enc = 0;
 
     while (enc_forwards_l_count <= to_move && enc_forwards_r_count <= to_move)
     {
@@ -387,51 +420,49 @@ void MicroMouse::goForward(unsigned int& curr_time, const int& blocks)
             const unsigned int elapsed_time = curr_time - time;
             time = curr_time;
 
-            int r = getDistR();
-            int l = getDistL();
-            int curr_delta_dist = r - l;
+            // Also known as the steer values.
+            int pid_ir_result = PID_IR(hist_error_ir, elapsed_time, old_error_ir);
+            int pid_enc_result = PID_enc(hist_error_enc, elapsed_time, old_error_enc);
 
-            Serial7.printf("L Sensor Reading: %d\r\n", l);
-            Serial7.printf("R Sensor Reading: %d\r\n", r);
-            Serial7.printf("Delta Sensor Reading: %d\r\n", curr_delta_dist);
+            int proposed_l_spd = l_spd_motor + pid_enc_result;
+            int proposed_r_spd = r_spd_motor - pid_enc_result;
 
-            // Also known as the steer value.
-            int pid_result = PID(curr_delta_dist, hist_error, elapsed_time, old_error);
+            proposed_l_spd += pid_ir_result;
+            proposed_r_spd -= pid_ir_result;
 
-            int new_l_spd_motor = l_spd_motor + pid_result;
-            int new_r_spd_motor = r_spd_motor - pid_result;
-
-            if (new_l_spd_motor > UPPER_MOTOR_LIMIT)
+            if (proposed_l_spd > UPPER_MOTOR_LIMIT)
             {
-                new_l_spd_motor = UPPER_MOTOR_LIMIT;
+                proposed_l_spd = UPPER_MOTOR_LIMIT;
             }
-            else if (new_l_spd_motor < 0)
+            else if (proposed_l_spd < LOWER_MOTOR_LIMIT)
             {
-                new_l_spd_motor = 0;
+                proposed_l_spd = LOWER_MOTOR_LIMIT;
+                digitalWriteFast(BUZZ_PIN, HIGH);
+            }
+            else
+            {
+                digitalWriteFast(BUZZ_PIN, LOW);
             }
 
-            if (new_r_spd_motor > UPPER_MOTOR_LIMIT)
+            if (proposed_r_spd > UPPER_MOTOR_LIMIT)
             {
-                new_r_spd_motor = UPPER_MOTOR_LIMIT;
+                proposed_r_spd = UPPER_MOTOR_LIMIT;
             }
-            else if (new_r_spd_motor < 0)
+            else if (proposed_r_spd < LOWER_MOTOR_LIMIT)
             {
-                new_r_spd_motor = 0;
+                proposed_r_spd = LOWER_MOTOR_LIMIT;
+                digitalWriteFast(BUZZ_PIN, HIGH);
             }
-            
-            Serial7.printf("Steer: %d\r\n", pid_result);
-            Serial7.printf("L Motor: %d\r\n", new_l_spd_motor);
-            Serial7.printf("R Motor: %d\r\n", new_r_spd_motor);
+            else
+            {
+                digitalWriteFast(BUZZ_PIN, LOW);
+            }
 
-            setMotorL(FORWARDS, new_l_spd_motor);
-            setMotorR(FORWARDS, new_r_spd_motor);
+            setMotorL(FORWARDS, proposed_l_spd);
+            setMotorR(FORWARDS, proposed_r_spd);
         }
 
     }
-
-    Serial7.printf("EXITED WHILE\r\n");
-    Serial.printf("Final L count: %d\r\n", enc_forwards_l_count);
-    Serial.printf("Final R count: %d\r\n", enc_forwards_r_count);
 
     setMotorL(STOP, 0);
     setMotorR(STOP, 0);
@@ -459,11 +490,7 @@ void MicroMouse::turnLeft()
     setMotorR(FORWARDS, 0);
     setMotorR(FORWARDS, r_spd_motor);
 
-    while (enc_backwards_l_count <= turn_ticks || enc_forwards_r_count <= turn_ticks);
-
-    Serial.printf("L Encoder: %d\r\n", enc_backwards_l_count);
-    Serial.printf("R Encoder: %d\r\n", enc_forwards_r_count);
-    
+    while (enc_backwards_l_count <= turn_ticks || enc_forwards_r_count <= turn_ticks);    
 
     setMotorL(STOP, 0);
     setMotorR(STOP, 0);
