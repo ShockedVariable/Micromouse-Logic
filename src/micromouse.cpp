@@ -18,19 +18,15 @@ const unsigned int ticks_to_move = 169;
 const unsigned int turn_ticks = 85;
 
 const float k_p_enc = 0.5f;
-const float k_i_enc = 0.0f;
+// const float k_i_enc = 0.0f;
 const float k_d_enc = 0.01f;
 
 const float k_p_ir = 0.08f;
-const float k_i_ir = 0.0f;
-const float k_d_ir = 0.001f;
+// const float k_i_ir = 0.0f;
+const float k_d_ir = 0.005f;
 
 const int l_spd_motor = 125;
 const int r_spd_motor = 125;
-
-// This is corralated to how often we increment our timer back in main.cpp.
-// Currently sampling every 1 ms.
-const unsigned short SAMPLE_RATE = 1000;
 
 void MicroMouse::initConnections()
 {
@@ -85,7 +81,7 @@ void MicroMouse::findCenter()
     center = d.r - d.l;
 }
 
-int MicroMouse::PID_IR(int& historal_err, const unsigned int& elapsed_time, int& prev_error)
+int MicroMouse::PID_IR(int& historal_err, int& prev_error)
 {
     Dists d = getDistRL();
     int sensor_delta = d.r - d.l;
@@ -94,7 +90,7 @@ int MicroMouse::PID_IR(int& historal_err, const unsigned int& elapsed_time, int&
     int error_ir = center - sensor_delta;
 
     // The integration required for I in PID. This approxmiates integrals by doing Riemann Sums.
-    historal_err += error_ir * elapsed_time;
+    // historal_err += error_ir * elapsed_time;
 
     // The derivative required for D in PID. This approxmiates the derivative by doing differences/deltas.
     int error_ir_delta = error_ir - prev_error;
@@ -103,25 +99,25 @@ int MicroMouse::PID_IR(int& historal_err, const unsigned int& elapsed_time, int&
     int p_error_ir = k_p_ir * error_ir;
 
     // The actual I in PID.
-    int i_error_ir = k_i_ir * historal_err;
+    // int i_error_ir = k_i_ir * historal_err;
 
     // The actual D in PID.
     int d_error_ir = k_d_ir * error_ir_delta;
 
-    int correction = p_error_ir + i_error_ir + d_error_ir;
+    int correction = p_error_ir + d_error_ir;
 
     prev_error = error_ir;
 
     return correction;
 }
 
-int MicroMouse::PID_enc(int& historal_err, const unsigned int& elapsed_time, int& prev_error)
+int MicroMouse::PID_enc(int& historal_err, int& prev_error)
 {
     // The error needed for PID calculation. Based on only left and right encoders.
     int error_enc = static_cast<int>(enc_forwards_r_count) - static_cast<int>(enc_forwards_l_count);
 
     // The integration required for I in PID. This approxmiates integrals by doing Riemann Sums.
-    historal_err += error_enc * elapsed_time;
+    // historal_err += error_enc * elapsed_time;
 
     // The derivative required for D in PID. This approxmiates the derivative by doing differences/deltas.
     int error_enc_delta = error_enc - prev_error;
@@ -130,12 +126,12 @@ int MicroMouse::PID_enc(int& historal_err, const unsigned int& elapsed_time, int
     int p_error_enc = k_p_enc * error_enc;
     
     // The actual I in PID.
-    int i_error_enc = k_i_enc * historal_err;
+    // int i_error_enc = k_i_enc * historal_err;
 
     // The actual D in PID.
     int d_error_enc = k_d_enc * error_enc_delta;
 
-    int correction = p_error_enc + i_error_enc + d_error_enc;
+    int correction = p_error_enc + d_error_enc;
 
     prev_error = error_enc;
 
@@ -399,13 +395,12 @@ void MicroMouse::rstAllEncCounters()
     rst_enc_forwards_r_counter();
 }
 
-void MicroMouse::goForward(unsigned int& curr_time, const int& blocks)
+void MicroMouse::goForward(const int& blocks)
 {
     setMotorL(FORWARDS, l_spd_motor);
     setMotorR(FORWARDS, 0);
     setMotorR(FORWARDS, r_spd_motor);
 
-    unsigned int time = curr_time;
     const unsigned int to_move = ticks_to_move * blocks;
 
     int old_error_ir = 0;
@@ -415,52 +410,46 @@ void MicroMouse::goForward(unsigned int& curr_time, const int& blocks)
 
     while (enc_forwards_l_count <= to_move && enc_forwards_r_count <= to_move)
     {
-        if (curr_time - time >= SAMPLE_RATE)
+        // Also known as the steer values.
+        int pid_ir_result = PID_IR(hist_error_ir, old_error_ir);
+        int pid_enc_result = PID_enc(hist_error_enc, old_error_enc);
+
+        int proposed_l_spd = l_spd_motor + pid_enc_result;
+        int proposed_r_spd = r_spd_motor - pid_enc_result;
+
+        proposed_l_spd += pid_ir_result;
+        proposed_r_spd -= pid_ir_result;
+
+        if (proposed_l_spd > UPPER_MOTOR_LIMIT)
         {
-            const unsigned int elapsed_time = curr_time - time;
-            time = curr_time;
-
-            // Also known as the steer values.
-            int pid_ir_result = PID_IR(hist_error_ir, elapsed_time, old_error_ir);
-            int pid_enc_result = PID_enc(hist_error_enc, elapsed_time, old_error_enc);
-
-            int proposed_l_spd = l_spd_motor + pid_enc_result;
-            int proposed_r_spd = r_spd_motor - pid_enc_result;
-
-            proposed_l_spd += pid_ir_result;
-            proposed_r_spd -= pid_ir_result;
-
-            if (proposed_l_spd > UPPER_MOTOR_LIMIT)
-            {
-                proposed_l_spd = UPPER_MOTOR_LIMIT;
-            }
-            else if (proposed_l_spd < LOWER_MOTOR_LIMIT)
-            {
-                proposed_l_spd = LOWER_MOTOR_LIMIT;
-                digitalWriteFast(BUZZ_PIN, HIGH);
-            }
-            else
-            {
-                digitalWriteFast(BUZZ_PIN, LOW);
-            }
-
-            if (proposed_r_spd > UPPER_MOTOR_LIMIT)
-            {
-                proposed_r_spd = UPPER_MOTOR_LIMIT;
-            }
-            else if (proposed_r_spd < LOWER_MOTOR_LIMIT)
-            {
-                proposed_r_spd = LOWER_MOTOR_LIMIT;
-                digitalWriteFast(BUZZ_PIN, HIGH);
-            }
-            else
-            {
-                digitalWriteFast(BUZZ_PIN, LOW);
-            }
-
-            setMotorL(FORWARDS, proposed_l_spd);
-            setMotorR(FORWARDS, proposed_r_spd);
+            proposed_l_spd = UPPER_MOTOR_LIMIT;
         }
+        else if (proposed_l_spd < LOWER_MOTOR_LIMIT)
+        {
+            proposed_l_spd = LOWER_MOTOR_LIMIT;
+            digitalWriteFast(BUZZ_PIN, HIGH);
+        }
+        else
+        {
+            digitalWriteFast(BUZZ_PIN, LOW);
+        }
+
+        if (proposed_r_spd > UPPER_MOTOR_LIMIT)
+        {
+            proposed_r_spd = UPPER_MOTOR_LIMIT;
+        }
+        else if (proposed_r_spd < LOWER_MOTOR_LIMIT)
+        {
+            proposed_r_spd = LOWER_MOTOR_LIMIT;
+            digitalWriteFast(BUZZ_PIN, HIGH);
+        }
+        else
+        {
+            digitalWriteFast(BUZZ_PIN, LOW);
+        }
+
+        setMotorL(FORWARDS, proposed_l_spd);
+        setMotorR(FORWARDS, proposed_r_spd);
 
     }
 

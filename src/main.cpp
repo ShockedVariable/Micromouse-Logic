@@ -2,16 +2,8 @@
 #include "directions.hpp"
 #include "micromouse.hpp"
 #include "pins.hpp"
-#include "TeensyTimerTool.h"
 
 MicroMouse mm;
-TeensyTimerTool::PeriodicTimer t1(TeensyTimerTool::TCK64);
-unsigned int curr_time = 0;
-
-void inc()
-{
-	++curr_time;
-}
 
 void setup() 
 {
@@ -24,15 +16,12 @@ void setup()
 	
 	// Serial7 is default for bluetooth module.
 	Serial7.begin(9600);
-	// delay(2500);
-
-	t1.begin(inc, 1); // 1 microsecond
 }
 
 void loop()
 {	
 
-	mm.goForward(curr_time, 3);
+	mm.goForward(3);
 	// delay(1000);
 	// mm.turnLeft();
 	// delay(1000);

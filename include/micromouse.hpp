@@ -32,7 +32,7 @@ public:
 	// BEGIN MOVEMENT FUNCTIONS
 
     // Makes the micromouse move forward.
-    void goForward(unsigned int& curr_time, const int& blocks);
+    void goForward(const int& blocks);
 
     // END MOVEMENT FUNCTIONS
 
@@ -205,8 +205,8 @@ private:
     // BEGIN PID FUNCTION
 
     // The PID functions that calculates the changes for our motors.
-    int PID_IR(int& historal_err, const unsigned int& elapsed_time, int& prev_error);
-    int PID_enc(int& historal_err, const unsigned int& elapsed_time, int& prev_error);
+    int PID_IR(int& historal_err, int& prev_error);
+    int PID_enc(int& historal_err, int& prev_error);
 
     // END PID FUNCTION
 
