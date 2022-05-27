@@ -8,10 +8,10 @@
 
 // By-product of using static member variables. Could this be implemented better? Check note in header file.
 // For now, it works fine as long as we do not instanitate another MicroMouse object.
-volatile unsigned int MicroMouse::enc_a_l_count = 0;
-unsigned int MicroMouse::enc_b_l_count = 0;
-unsigned int MicroMouse::enc_a_r_count = 0;
-unsigned int MicroMouse::enc_b_r_count = 0;
+volatile unsigned int MicroMouse::enc_backwards_l_count = 0;
+volatile unsigned int MicroMouse::enc_forwards_l_count = 0;
+volatile unsigned int MicroMouse::enc_backwards_r_count = 0;
+volatile unsigned int MicroMouse::enc_forwards_r_count = 0;
 int MicroMouse::center = 0;
 
 const unsigned int ticks_to_move = 169;
@@ -73,10 +73,10 @@ void MicroMouse::attachInterrupts()
 {
     // All interrupts caused by the encoder will call the respective function
     // to increment the respective counter.
-    attachInterrupt(M2_ENC_A_PIN, enc_a_l_intr_handler, FALLING); // check if rising or falling
-    attachInterrupt(M2_ENC_B_PIN, enc_b_l_intr_handler, FALLING);
-    attachInterrupt(M1_ENC_A_PIN, enc_a_r_intr_handler, FALLING);
-    attachInterrupt(M1_ENC_B_PIN, enc_b_r_intr_handler, FALLING);
+    attachInterrupt(M2_ENC_A_PIN, enc_backwards_l_intr_handler, FALLING); // check if rising or falling
+    attachInterrupt(M2_ENC_B_PIN, enc_forwards_l_intr_handler, FALLING);
+    attachInterrupt(M1_ENC_A_PIN, enc_backwards_r_intr_handler, FALLING);
+    attachInterrupt(M1_ENC_B_PIN, enc_forwards_r_intr_handler, FALLING);
 }
 
 void MicroMouse::findCenter()
@@ -121,24 +121,24 @@ int MicroMouse::PID(const int& sensor_data, int& historal_err, const unsigned in
     return correction;
 }
 
-void MicroMouse::enc_a_l_intr_handler()
+void MicroMouse::enc_backwards_l_intr_handler()
 {
-    ++enc_a_l_count;
+    ++enc_backwards_l_count;
 }
 
-void MicroMouse::enc_b_l_intr_handler()
+void MicroMouse::enc_forwards_l_intr_handler()
 {
-    ++enc_b_l_count;
+    ++enc_forwards_l_count;
 }
 
-void MicroMouse::enc_a_r_intr_handler()
+void MicroMouse::enc_backwards_r_intr_handler()
 {
-    ++enc_a_r_count;
+    ++enc_backwards_r_count;
 }
 
-void MicroMouse::enc_b_r_intr_handler()
+void MicroMouse::enc_forwards_r_intr_handler()
 {
-    ++enc_b_r_count;
+    ++enc_forwards_r_count;
 }
 
 int MicroMouse::getDistL()
@@ -320,42 +320,42 @@ void MicroMouse::setMotorRPulseDir(const Direction& dir, const int& mspeed)
 
 unsigned int MicroMouse::enc_a_l_val()
 {
-    return enc_a_l_count;
+    return enc_backwards_l_count;
 }
 
 unsigned int MicroMouse::enc_b_l_val()
 {
-    return enc_b_l_count;
+    return enc_forwards_l_count;
 }
 
 unsigned int MicroMouse::enc_a_r_val()
 {
-    return enc_a_r_count;
+    return enc_backwards_r_count;
 }
 
 unsigned int MicroMouse::enc_b_r_val()
 {
-    return enc_b_r_count;
+    return enc_forwards_r_count;
 }
 
 void MicroMouse::rst_enc_a_l_counter()
 {
-    enc_a_l_count = 0;
+    enc_backwards_l_count = 0;
 }
 
 void MicroMouse::rst_enc_b_l_counter()
 {
-    enc_b_l_count = 0;
+    enc_forwards_l_count = 0;
 }
 
 void MicroMouse::rst_enc_a_r_counter()
 {
-    enc_a_r_count = 0;
+    enc_backwards_r_count = 0;
 }
 
 void MicroMouse::rst_enc_b_r_counter()
 {
-    enc_b_r_count = 0;
+    enc_forwards_r_count = 0;
 }
 
 void MicroMouse::rstAllEncCounters()
@@ -378,17 +378,10 @@ void MicroMouse::goForward(unsigned int& curr_time, const int& blocks)
 
     const unsigned int to_move = ticks_to_move * blocks;
 
-    unsigned int b_l_val = enc_b_l_val();
-    unsigned int b_r_val = enc_b_r_val();
-
     int old_error = 0;
-    // Serial7.printf("%d\r\n", b_l_val);
 
-    while (b_l_val <= to_move)
+    while (enc_forwards_l_count <= to_move && enc_forwards_r_count <= to_move)
     {
-        Serial7.printf("%d\r\n", b_l_val);
-        Serial7.printf("%d\r\n", b_r_val);
-
         if (curr_time - time >= SAMPLE_RATE)
         {
             const unsigned int elapsed_time = curr_time - time;
@@ -403,7 +396,7 @@ void MicroMouse::goForward(unsigned int& curr_time, const int& blocks)
             Serial7.printf("Delta Sensor Reading: %d\r\n", curr_delta_dist);
 
             // Also known as the steer value.
-            int pid_result = PID(curr_delta_dist, hist_error, elapsed_time, old_error); 
+            int pid_result = PID(curr_delta_dist, hist_error, elapsed_time, old_error);
 
             int new_l_spd_motor = l_spd_motor + pid_result;
             int new_r_spd_motor = r_spd_motor - pid_result;
@@ -434,11 +427,12 @@ void MicroMouse::goForward(unsigned int& curr_time, const int& blocks)
             setMotorR(FORWARDS, new_r_spd_motor);
         }
 
-        b_l_val = enc_b_l_val();
-        b_r_val = enc_b_r_val();
     }
 
     Serial7.printf("EXITED WHILE\r\n");
+    Serial.printf("Final L count: %d\r\n", enc_forwards_l_count);
+    Serial.printf("Final R count: %d\r\n", enc_forwards_r_count);
+
     setMotorL(STOP, 0);
     setMotorR(STOP, 0);
 
@@ -451,14 +445,7 @@ void MicroMouse::turnRight()
     setMotorR(BACKWARDS, 0);
     setMotorR(BACKWARDS, r_spd_motor);
 
-    unsigned int l_val = enc_b_l_val();
-    unsigned int r_val = enc_a_r_val();
-
-    while (l_val <= turn_ticks || r_val <= turn_ticks)
-    {
-        l_val = enc_b_l_val();
-        r_val = enc_a_r_val();
-    }
+    while (enc_forwards_l_count <= turn_ticks || enc_backwards_r_count <= turn_ticks);
 
     setMotorL(STOP, 0);
     setMotorR(STOP, 0);
@@ -472,19 +459,11 @@ void MicroMouse::turnLeft()
     setMotorR(FORWARDS, 0);
     setMotorR(FORWARDS, r_spd_motor);
 
-    // unsigned int l_val = enc_a_l_val();
-    // unsigned int r_val = enc_b_r_val();
+    while (enc_backwards_l_count <= turn_ticks || enc_forwards_r_count <= turn_ticks);
 
-    while (enc_a_l_count <= turn_ticks);
-
-    // while (l_val <= turn_ticks)
-    // {
-    //     // Serial7.printf("Function: %d\r\n", l_val);
-    //     // Serial7.printf("Direct: %d\r\n", enc_a_l_count);
-
-    //     l_val = enc_a_l_val();
-    //     // r_val = enc_b_r_val();
-    // }
+    Serial.printf("L Encoder: %d\r\n", enc_backwards_l_count);
+    Serial.printf("R Encoder: %d\r\n", enc_forwards_r_count);
+    
 
     setMotorL(STOP, 0);
     setMotorR(STOP, 0);

@@ -171,13 +171,13 @@ public:
 
     // The main job of this function is to increment our left enc_a and enc_b counters
     // to be able to tell how many ticks the encoder has moved.
-    static void enc_a_l_intr_handler();
-    static void enc_b_l_intr_handler();
+    static void enc_backwards_l_intr_handler();
+    static void enc_forwards_l_intr_handler();
 
     // The main job of this function is to increment our right enc_a and enc_b counters
     // to be able to tell how many ticks the encoder has moved.
-    static void enc_a_r_intr_handler();
-    static void enc_b_r_intr_handler();
+    static void enc_backwards_r_intr_handler();
+    static void enc_forwards_r_intr_handler();
 
 private:
     /* 
@@ -186,8 +186,8 @@ private:
     the combination of these two allow us to tell if the encoder is
     moving forward or backwards.
     */
-    static volatile unsigned int enc_a_l_count;
-    static unsigned int enc_b_l_count;
+    static volatile unsigned int enc_backwards_l_count;
+    static volatile unsigned int enc_forwards_l_count;
 
     /* 
     These variables are for the right motor encoder. 
@@ -195,8 +195,8 @@ private:
     the combination of these two allow us to tell if the encoder is
     moving forward or backwards.
     */
-    static unsigned int enc_a_r_count;
-    static unsigned int enc_b_r_count;
+    static volatile unsigned int enc_backwards_r_count;
+    static volatile unsigned int enc_forwards_r_count;
 
     // Stores the sensor reading of the mouse when placed in the center during setup.
     static int center;

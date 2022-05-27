@@ -23,7 +23,7 @@ void setup()
 	delay(2000);
 	// Serial7 is default for bluetooth module.
 	Serial7.begin(9600);
-	delay(2500);
+	// delay(2500);
 
 	Serial7.printf("Center: %d\r\n", mm.getCenter());
 
@@ -33,16 +33,15 @@ void setup()
 void loop()
 {	
 
-	// for (unsigned char i = 0; i < 3; i++)
-	// {
-	// 	mm.goForward(curr_time, 1);
-	// }
-	mm.goForward(curr_time, 2);
-	delay(1000);
-	mm.turnLeft();
+	mm.goForward(curr_time, 1);
+	// delay(1000);
+	// mm.turnLeft();
 	// delay(1000);
 	// mm.turnRight();
+	// Serial.printf("Left Encoder: %d\r\n", mm.enc_b_l_val());
+	// Serial.printf("Right Encoder: %d\r\n", mm.enc_b_r_val());
 
+	// delay(1000);
 	while (true);
 	// unsigned short left_sensor = mm.getDistL();
 	// unsigned short right_sensor = mm.getDistR();
