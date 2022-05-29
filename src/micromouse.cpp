@@ -14,9 +14,9 @@ volatile unsigned int MicroMouse::enc_backwards_r_count = 0;
 volatile unsigned int MicroMouse::enc_forwards_r_count = 0;
 int MicroMouse::center = 0;
 
-const unsigned int ticks_to_move = 169;
+const unsigned int ticks_to_move = 160;
 // 180 appears to be 85 ticks?
-const unsigned int turn_ticks = 42;
+const unsigned int turn_ticks = 35;
 
 const float k_p_enc = 0.5f;
 // const float k_i_enc = 0.0f;
@@ -28,6 +28,11 @@ const float k_d_ir = 0.005f;
 
 const int l_spd_motor = 125;
 const int r_spd_motor = 125;
+
+const int right_side_wall_threshold = 252;
+const int left_side_wall_threshold = 62;
+const int front_wall_threshold_l = 501;
+const int front_wall_threshold_r = 410;
 
 void shiftDirection(short& x, short& y, const Direction& dir, const short& amt)
 {
@@ -177,7 +182,6 @@ void MicroMouse::enc_backwards_l_intr_handler()
 void MicroMouse::enc_forwards_l_intr_handler()
 {
     ++enc_forwards_l_count;
-    // Serial.printf("Left: %d\r\n", enc_forwards_l_count);
 }
 
 void MicroMouse::enc_backwards_r_intr_handler()
@@ -188,9 +192,8 @@ void MicroMouse::enc_backwards_r_intr_handler()
 void MicroMouse::enc_forwards_r_intr_handler()
 {
     ++enc_forwards_r_count;
-    Serial.printf("Right %d\r\n", enc_forwards_r_count);
+    // Serial.printf("%d\r\n", encfor);
 }
-
 
 int MicroMouse::getXpos()
 {
@@ -207,6 +210,28 @@ Direction MicroMouse::getDir()
     return dir;
 }
 
+bool MicroMouse::detectFrontWall() 
+{
+    Dists d = getDistFrontRL();
+
+    if(d.l > front_wall_threshold_l && d.r > front_wall_threshold_r) 
+    {
+        setMotorL(STOP, 0);
+        setMotorR(STOP, 0);
+        return true;
+    }
+
+    return false;
+}
+
+Walls MicroMouse::detectSideWalls() 
+{
+    Dists d = getDistRL();
+    return Walls {
+            .r = d.r <= right_side_wall_threshold,
+            .l = d.l <= left_side_wall_threshold,
+    };
+}
 
 int MicroMouse::getDistL()
 {
@@ -245,6 +270,18 @@ Dists MicroMouse::getDistRL()
 
     _d.r = analogRead(RECEIVER_R_PIN);
     _d.l = analogRead(RECEIVER_L_PIN);
+
+    return _d;
+}
+
+Dists MicroMouse::getDistFrontRL()
+{
+    digitalWrite(EMIT_FL_PIN, HIGH);
+    digitalWrite(EMIT_FR_PIN, HIGH);
+    delay(EMITTER_ON_TIME);
+
+    _d.r = analogRead(RECEIVER_FR_PIN);
+    _d.l = analogRead(RECEIVER_FL_PIN);
 
     return _d;
 }

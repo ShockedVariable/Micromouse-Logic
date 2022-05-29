@@ -9,6 +9,12 @@ struct Dists
     int l;
 };
 
+struct Walls
+{
+    bool r;
+    bool l;
+};
+
 void shiftDirection(short& x, short& y, const Direction& dir, const short& amt = 1);
 
 class MicroMouse
@@ -32,7 +38,14 @@ public:
 
     // END INITIALIZATION FUNCTIONS
 
-	
+    // BEGIN GET POSTION FUNCTIONS
+
+    int getXpos();
+
+    int getYpos();
+
+    Direction getDir();
+
 	// BEGIN MOVEMENT FUNCTIONS
 
     // Makes the micromouse move forward.
@@ -54,11 +67,6 @@ public:
 
     // BEGIN DISTANCE FUNCTIONS
 
-    int getXpos();
-
-    int getYpos();
-
-    Direction getDir();
     // Returns the distance the left emitter is receiving.
     static int getDistL();
 
@@ -74,8 +82,17 @@ public:
     // Returns a struct containing the distances read from the right and left emitters.
     Dists getDistRL();
 
+    Dists getDistFrontRL();
+
     // END DISTANCE FUNCTIONS
 
+
+    // BEGIN CHECK WALLS
+    bool detectFrontWall();
+
+    Walls detectSideWalls();
+
+    // END CHECK WALLS
 
     // BEGIN SET MOTOR FUNCTIONS
 

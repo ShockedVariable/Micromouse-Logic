@@ -3,7 +3,7 @@
 #include "micromouse.hpp"
 #include "pins.hpp"
 
-MicroMouse mm;
+MicroMouse mm(0, 0, Direction::FORWARDS);
 
 void setup() 
 {
@@ -23,8 +23,8 @@ void loop()
 	while (mm.getDistFR() < 900);
 
 	delay(1000);
-	// mm.goForward(2);
-	mm.turnRight(1);
+	mm.goForward(25);
+	// mm.turnRight(25);
 	delay(2500);
 	
 }
