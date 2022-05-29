@@ -1,6 +1,7 @@
 #ifndef micromouse_hpp
 #define micromouse_hpp
 
+#include <array>
 #include "directions.hpp"
 
 struct Dists
@@ -93,6 +94,13 @@ public:
     Walls detectSideWalls();
 
     // END CHECK WALLS
+
+
+    // BEGIN GET WALLS FUNCTION
+
+    std::array<bool, 3> getWalls();
+
+    //
 
     // BEGIN SET MOTOR FUNCTIONS
 

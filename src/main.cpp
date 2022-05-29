@@ -2,6 +2,7 @@
 #include "directions.hpp"
 #include "micromouse.hpp"
 #include "pins.hpp"
+#include "testhelper.hpp"
 
 MicroMouse mm(0, 0, Direction::FORWARDS);
 
@@ -9,6 +10,7 @@ void setup()
 {
 	mm.initConnections();
 	mm.attachInterrupts();
+	setupTestMaze();
 
 	mm.findCenter();
 
@@ -23,8 +25,9 @@ void loop()
 	while (mm.getDistFR() < 900);
 
 	delay(1000);
-	mm.goForward(25);
-	// mm.turnRight(25);
+	// mm.goForward(1);
+	// delay(1000);
+	mm.turnRight(1);
 	delay(2500);
 	
 }

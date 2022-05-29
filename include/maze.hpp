@@ -15,7 +15,7 @@ struct Point
 struct DirPoint
 {
 	Point position;
-	short direction;
+	Direction direction;
 }; 
 
 
