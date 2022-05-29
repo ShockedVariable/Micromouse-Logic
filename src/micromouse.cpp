@@ -475,6 +475,25 @@ void MicroMouse::turnRight(const int& blocks)
     const unsigned int to_move = turn_ticks * blocks;
 
     while (enc_forwards_l_count <= to_move || enc_backwards_r_count <= to_move);
+    {
+        // if (enc_forwards_l_count <= to_move && enc_backwards_r_count <= to_move)
+        // {
+        //     setMotorL(FORWARDS, l_spd_motor);
+        //     setMotorR(BACKWARDS, r_spd_motor);
+        // }
+        if (enc_forwards_l_count <= to_move && enc_backwards_r_count > to_move)
+        {
+            setMotorL(FORWARDS, l_spd_motor);
+            setMotorR(STOP, 0);
+        }
+        else if (enc_backwards_r_count <= to_move && enc_forwards_l_count > to_move)
+        {
+            setMotorL(STOP, 0);
+            setMotorR(BACKWARDS, r_spd_motor);
+        }
+        Serial7.printf("Left: %d\r\n", enc_backwards_l_count);
+        Serial7.printf("Right: %d\r\n", enc_forwards_r_count);
+    };
 
     setMotorL(STOP, 0);
     setMotorR(STOP, 0);
@@ -490,7 +509,23 @@ void MicroMouse::turnLeft(const int& blocks)
 
     const unsigned int to_move = turn_ticks * blocks;
 
-    while (enc_backwards_l_count <= to_move || enc_forwards_r_count <= to_move);    
+    while (enc_backwards_l_count <= to_move || enc_forwards_r_count <= to_move)
+    {
+        // if (enc_backwards_l_count <= to_move && enc_forwards_r_count <= to_move)
+        // {
+
+        // }
+        if (enc_backwards_l_count <= to_move && enc_forwards_r_count > to_move)
+        {
+            setMotorL(BACKWARDS, l_spd_motor);
+            setMotorR(FORWARDS, 0);
+        }
+        else if (enc_backwards_l_count > to_move && enc_forwards_r_count <= to_move)
+        {
+            setMotorL(STOP, 0);
+            setMotorR(FORWARDS, r_spd_motor);
+        }
+    }   
 
     setMotorL(STOP, 0);
     setMotorR(STOP, 0);

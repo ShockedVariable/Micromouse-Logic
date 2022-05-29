@@ -20,7 +20,6 @@ void setup()
 
 void loop()
 {	
-	// std::cout << Direction::FORWARDS + 1 << std::endl;
 	while (mm.getDistFR() < 900);
 
 	delay(1000);

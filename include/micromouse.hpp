@@ -32,9 +32,20 @@ public:
 	// BEGIN MOVEMENT FUNCTIONS
 
     // Makes the micromouse move forward.
-    void goForward(const int& blocks);
+    virtual void goForward(const int& blocks = 1);
 
     // END MOVEMENT FUNCTIONS
+
+
+    // BEGIN TURN FUNCTIONS
+
+    // Makes the micromouse turn right.
+    virtual void turnRight(const int& blocks = 1);
+
+    // Makes the micromouse turn left.
+    virtual void turnLeft(const int& blocks = 1);
+
+    // END TURN FUNCTIONS
 
 
     // BEGIN DISTANCE FUNCTIONS
@@ -72,17 +83,6 @@ public:
     void setMotorRPulseDir(const Direction& dir, const int& mspeed);
 
     // END SET MOTOR FUNCTIONS
-
-
-    // BEGIN TURN FUNCTIONS
-
-    // Makes the micromouse turn right.
-    void turnRight(const int& blocks);
-
-    // Makes the micromouse turn left.
-    void turnLeft(const int& blocks);
-
-    // END TURN FUNCTIONS
 
 	/*
 	We have pins A and B on the encoder to determine whether the encoder is going forward or backwards.
@@ -176,6 +176,10 @@ public:
     // to be able to tell how many ticks the encoder has moved.
     static void enc_backwards_r_intr_handler();
     static void enc_forwards_r_intr_handler();
+
+protected:
+    short x_pos, y_pos;
+    Direction dir;
 
 private:
     /* 
