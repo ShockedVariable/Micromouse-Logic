@@ -54,6 +54,11 @@ public:
 
     // BEGIN DISTANCE FUNCTIONS
 
+    int getXpos();
+
+    int getYpos();
+
+    Direction getDir();
     // Returns the distance the left emitter is receiving.
     static int getDistL();
 

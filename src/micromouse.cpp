@@ -191,6 +191,23 @@ void MicroMouse::enc_forwards_r_intr_handler()
     Serial.printf("Right %d\r\n", enc_forwards_r_count);
 }
 
+
+int MicroMouse::getXpos()
+{
+    return x_pos;
+}
+
+int MicroMouse::getYpos()
+{
+    return y_pos;
+}
+
+Direction MicroMouse::getDir()
+{
+    return dir;
+}
+
+
 int MicroMouse::getDistL()
 {
     int dist;
