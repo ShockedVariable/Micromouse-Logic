@@ -450,8 +450,8 @@ void MicroMouse::goForward(const int& blocks)
         int proposed_l_spd = l_spd_motor + pid_enc_result;
         int proposed_r_spd = r_spd_motor - pid_enc_result;
 
-        // proposed_l_spd += pid_ir_result;
-        // proposed_r_spd -= pid_ir_result;
+        proposed_l_spd += pid_ir_result;
+        proposed_r_spd -= pid_ir_result;
 
         if (proposed_l_spd > UPPER_MOTOR_LIMIT)
         {
