@@ -495,7 +495,7 @@ void MicroMouse::goForward(const int& blocks)
     setMotorR(FORWARDS, 0);
     setMotorR(FORWARDS, r_spd_motor);
 
-    const unsigned int to_move = ticks_to_move * blocks;
+    const unsigned int to_move = (ticks_to_move * blocks) - 2;
 
     int old_error_ir = 0;
     int old_error_enc = 0;
@@ -546,6 +546,13 @@ void MicroMouse::goForward(const int& blocks)
         setMotorR(FORWARDS, proposed_r_spd);
 
     }
+    
+    rstAllEncCounters();
+
+    setMotorL(BACKWARDS, 100);
+    setMotorR(BACKWARDS, 100);
+
+    while (enc_forwards_l_count <= 2 && enc_forwards_r_count <= 2);
 
     setMotorL(STOP, 0);
     setMotorR(STOP, 0);
