@@ -9,6 +9,8 @@ struct Dists
     int l;
 };
 
+void shiftDirection(short& x, short& y, const Direction& dir, const short& amt = 1);
+
 class MicroMouse
 {
 public:

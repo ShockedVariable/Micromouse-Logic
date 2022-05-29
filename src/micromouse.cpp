@@ -29,6 +29,27 @@ const float k_d_ir = 0.005f;
 const int l_spd_motor = 125;
 const int r_spd_motor = 125;
 
+void shiftDirection(short& x, short& y, const Direction& dir, const short& amt)
+{
+    switch(dir)
+    {
+        case Direction::FORWARDS:
+            y -= amt;
+            break;
+        case Direction::RIGHT:
+            x += amt;
+            break;
+        case Direction::BACKWARDS:
+            y += amt;
+            break;
+        case Direction::LEFT:
+            x -= amt;
+            break;
+        default:
+            break;
+    }
+}
+
 MicroMouse::MicroMouse(const short& x, const short& y, const Direction& dir)
     : x_pos{x}, y_pos{y}, dir{dir}
 { 
