@@ -16,5 +16,25 @@ void PathFinder::goForward(const int& blocks)
 
 void PathFinder::turnRight(const int& blocks)
 {
-    dir = shiftClockwise();
+    dir = shiftClockwise(dir);
+    best_path.pushMovement(Direction::RIGHT);
+}
+
+void PathFinder::turnLeft(const int& blocks)
+{
+    dir = shiftCounterClockwise(dir);
+    best_path.pushMovement(Direction::LEFT);
+}
+
+void PathFinder::runPath()
+{
+    best_path.runList();
+}
+
+void runPathFinder(PathFinder& pathfinder, Maze& maze)
+{
+    // while ()
+    // {
+
+    // }
 }
