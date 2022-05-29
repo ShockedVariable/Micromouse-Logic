@@ -29,6 +29,11 @@ const float k_d_ir = 0.005f;
 const int l_spd_motor = 125;
 const int r_spd_motor = 125;
 
+MicroMouse::MicroMouse(const short& x, const short& y, const Direction& dir)
+    : x_pos{x}, y_pos{y}, dir{dir}
+{ 
+}
+
 void MicroMouse::initConnections()
 {
     // Setting baud rate.

@@ -12,6 +12,8 @@ struct Dists
 class MicroMouse
 {
 public:
+    MicroMouse(const short& x, const short& y, const Direction& dir);
+
     // BEGIN INITIALIZATION FUNCTIONS
 
     // The job of this function is to initialize all the interal connections
