@@ -15,7 +15,8 @@ volatile unsigned int MicroMouse::enc_forwards_r_count = 0;
 int MicroMouse::center = 0;
 
 const unsigned int ticks_to_move = 169;
-const unsigned int turn_ticks = 85;
+// 180 appears to be 85 ticks?
+const unsigned int turn_ticks = 42;
 
 const float k_p_enc = 0.5f;
 // const float k_i_enc = 0.0f;
@@ -465,13 +466,15 @@ void MicroMouse::goForward(const int& blocks)
     rstAllEncCounters();
 }
 
-void MicroMouse::turnRight()
+void MicroMouse::turnRight(const int& blocks)
 {
     setMotorL(FORWARDS, l_spd_motor);
     setMotorR(BACKWARDS, 0);
     setMotorR(BACKWARDS, r_spd_motor);
 
-    while (enc_forwards_l_count <= turn_ticks || enc_backwards_r_count <= turn_ticks);
+    const unsigned int to_move = turn_ticks * blocks;
+
+    while (enc_forwards_l_count <= to_move || enc_backwards_r_count <= to_move);
 
     setMotorL(STOP, 0);
     setMotorR(STOP, 0);
@@ -479,13 +482,15 @@ void MicroMouse::turnRight()
     rstAllEncCounters();
 }
 
-void MicroMouse::turnLeft()
+void MicroMouse::turnLeft(const int& blocks)
 {
     setMotorL(BACKWARDS, l_spd_motor);
     setMotorR(FORWARDS, 0);
     setMotorR(FORWARDS, r_spd_motor);
 
-    while (enc_backwards_l_count <= turn_ticks || enc_forwards_r_count <= turn_ticks);    
+    const unsigned int to_move = turn_ticks * blocks;
+
+    while (enc_backwards_l_count <= to_move || enc_forwards_r_count <= to_move);    
 
     setMotorL(STOP, 0);
     setMotorR(STOP, 0);

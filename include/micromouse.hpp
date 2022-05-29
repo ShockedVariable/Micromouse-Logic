@@ -77,10 +77,10 @@ public:
     // BEGIN TURN FUNCTIONS
 
     // Makes the micromouse turn right.
-    void turnRight();
+    void turnRight(const int& blocks);
 
     // Makes the micromouse turn left.
-    void turnLeft();
+    void turnLeft(const int& blocks);
 
     // END TURN FUNCTIONS
 

@@ -24,7 +24,8 @@ void loop()
 	while (mm.getDistFR() < 900);
 
 	delay(1000);
-	mm.goForward(2);
+	// mm.goForward(2);
+	mm.turnRight(1);
 	delay(2500);
 	
 }

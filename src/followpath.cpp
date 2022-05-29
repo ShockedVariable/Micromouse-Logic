@@ -28,22 +28,18 @@ void FollowPath::runList()
         curr_move = pathList.front();
         pathList.pop_front();
 
-        switch (curr_move.movement)
+        switch(curr_move.movement)
         {
             case Direction::LEFT:
-                for (int i = 0; i < curr_move.amount; i++)
-                {
-                    mouse->turnLeft();
-                }
+                mouse->turnLeft(curr_move.amount);
                 break;
             case Direction::RIGHT:
-                for (int i = 0; i < curr_move.amount; i++)
-                {
-                    mouse->turnRight();
-                }
+                mouse->turnRight(curr_move.amount);
                 break;
             case Direction::FORWARDS:
                 mouse->goForward(curr_move.amount);
+                break;
+            default:
                 break;
         }
     }
