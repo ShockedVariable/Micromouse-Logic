@@ -84,7 +84,11 @@ void MicroMouse::findCenter()
 int MicroMouse::PID_IR(int& historal_err, int& prev_error)
 {
     Dists d = getDistRL();
+    // Serial7.printf("Right: %d\r\n", d.r);
+    // Serial7.printf("Left: %d\r\n", d.l);
     int sensor_delta = d.r - d.l;
+    Serial7.printf("Center: %d\r\n", center);
+    Serial7.printf("Delta: %d\r\n", sensor_delta);
 
     // The error needed for PID calculation. Based on only left and right sensors.
     int error_ir = center - sensor_delta;
@@ -146,6 +150,7 @@ void MicroMouse::enc_backwards_l_intr_handler()
 void MicroMouse::enc_forwards_l_intr_handler()
 {
     ++enc_forwards_l_count;
+    // Serial.printf("Left: %d\r\n", enc_forwards_l_count);
 }
 
 void MicroMouse::enc_backwards_r_intr_handler()
@@ -156,6 +161,7 @@ void MicroMouse::enc_backwards_r_intr_handler()
 void MicroMouse::enc_forwards_r_intr_handler()
 {
     ++enc_forwards_r_count;
+    Serial.printf("Right %d\r\n", enc_forwards_r_count);
 }
 
 int MicroMouse::getDistL()
@@ -417,8 +423,8 @@ void MicroMouse::goForward(const int& blocks)
         int proposed_l_spd = l_spd_motor + pid_enc_result;
         int proposed_r_spd = r_spd_motor - pid_enc_result;
 
-        proposed_l_spd += pid_ir_result;
-        proposed_r_spd -= pid_ir_result;
+        // proposed_l_spd += pid_ir_result;
+        // proposed_r_spd -= pid_ir_result;
 
         if (proposed_l_spd > UPPER_MOTOR_LIMIT)
         {
