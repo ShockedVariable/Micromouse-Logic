@@ -8,8 +8,8 @@ enum Direction
   FORWARDS = 0, RIGHT = 1, BACKWARDS = 2, LEFT = 3, STOP = 4
 };
 
-char shiftClockwise(const Direction& d);
+Direction shiftClockwise(const Direction& d);
 
-char shiftCounterClosewise(const Direction& d);
+Direction shiftCounterClockwise(const Direction& d);
 
 #endif

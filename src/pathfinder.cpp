@@ -8,7 +8,13 @@ PathFinder::PathFinder(MicroMouse& mouse)
 {
 }
 
-void PathFinder::turnRight(const int& amt)
+void PathFinder::goForward(const int& blocks)
 {
-    
+    shiftDirection(x_pos, y_pos, dir);
+    best_path.pushMovement(Direction::FORWARDS);
+}
+
+void PathFinder::turnRight(const int& blocks)
+{
+    dir = shiftClockwise();
 }

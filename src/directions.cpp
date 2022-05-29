@@ -1,16 +1,58 @@
 #include "directions.hpp"
 
-char shiftClockwise(const Direction& d)
-{
-    return (d + 1) % 4;
+Direction shiftClockwise(const Direction& d)
+{   
+    const unsigned char direction_temp = (d + 1) % 4;
+    Direction dir;
+    
+    switch(direction_temp)
+    {
+        case 0:
+            dir = Direction::FORWARDS;
+            break;
+        case 1:
+            dir = Direction::RIGHT;
+            break;
+        case 2:
+            dir= Direction::BACKWARDS;
+            break;
+        case 3:
+            dir = Direction::LEFT;
+            break;
+        default:
+            break;
+    }
+
+    return dir;
 }
 
-char shiftCounterClockwise(const Direction& d)
+Direction shiftCounterClockwise(const Direction& d)
 {
     if (!d)
     {
         return Direction::LEFT;
     }
 
-    return (d - 1) % 4;
+    const unsigned char direction_temp = (d - 1) % 4; 
+    Direction dir;
+
+    switch(direction_temp)
+    {
+        case 0:
+            dir = Direction::FORWARDS;
+            break;
+        case 1:
+            dir = Direction::RIGHT;
+            break;
+        case 2:
+            dir= Direction::BACKWARDS;
+            break;
+        case 3:
+            dir = Direction::LEFT;
+            break;
+        default:
+            break;
+    }
+        
+    return dir;
 }
