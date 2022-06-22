@@ -13,7 +13,6 @@ struct Command
 class FollowPath
 {
 public:
-
     FollowPath(MicroMouse& mouse);
 
     void pushMovement(const Direction& move);
@@ -24,8 +23,5 @@ private:
     std::deque<Command> pathList;
     MicroMouse* mouse;
 };
-
-
-
 
 #endif

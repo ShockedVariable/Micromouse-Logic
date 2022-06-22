@@ -10,7 +10,7 @@
 
 
 Maze::Maze()
-: finalPath{false}
+	: finalPath{false}
 {
 	// Maze array initialization
 
@@ -62,6 +62,7 @@ void Maze::exploreMaze(MicroMouse& mouse)
 	    finalPath = false;
 		std::array<bool*,4> block = this->getBlockWalls(mouse.getXpos(),mouse.getYpos());
 		std::array<bool,3> walls = mouse.getWalls();
+		
 		*block[mouse.getDir()] = walls[1];
 		*block[shiftClockwise(mouse.getDir())] = walls[2];
 		*block[shiftCounterClockwise(mouse.getDir())] = walls[0];
@@ -72,7 +73,7 @@ void Maze::exploreMaze(MicroMouse& mouse)
 	}
 }
 
-std::vector<DirPoint> getSurroundingPoints(Point p, std::array<bool*,4>& walls)
+std::vector<DirPoint> Maze::getSurroundingPoints(Point p, std::array<bool*,4>& walls)
 {
 	std::vector<DirPoint> blocks;
 	if(p.y > 0 && !(*walls[0]))
@@ -91,6 +92,14 @@ std::vector<DirPoint> getSurroundingPoints(Point p, std::array<bool*,4>& walls)
 	{
 		blocks.push_back({Point{(short)(p.x-1),p.y},Direction::LEFT});
 	}
+	Serial7.printf("Board Vals: ");
+	for (DirPoint d: blocks)
+	{
+		Serial7.printf("%d ", this->board[d.position.x][d.position.y]);
+	}
+	Serial7.printf("\r\n");
+	
+	
 	return blocks;
 }
 
@@ -113,29 +122,37 @@ void Maze::moveMouse(MicroMouse& mouse)
 
 	DirPoint minPoint = getMinPoint(surrPoints,mouse, this->board);
 
+	mouse.setXpos(minPoint.position.x);
+	mouse.setYpos(minPoint.position.y);
+	mouse.setDir(minPoint.direction);
+
 	if(minPoint.direction == mouse.getDir())
 	{
 		mouse.goForward();
+		delay(500);
 	}
 	else if(minPoint.direction == shiftClockwise(mouse.getDir()))
 	{
 		mouse.turnRight();
-		delay(50);
+		delay(500);
 		mouse.goForward();
+		delay(500);
 	}
 	else if(minPoint.direction == shiftCounterClockwise(mouse.getDir()))
 	{
 		mouse.turnLeft();
-		delay(50);
+		delay(500);
 		mouse.goForward();
+		delay(500);
 	}
 	else
 	{
 		mouse.turnRight();
-		delay(50);
+		delay(500);
 		mouse.turnRight();
-		delay(50);
+		delay(500);
 		mouse.goForward();
+		delay(500);
 	}
 }
 

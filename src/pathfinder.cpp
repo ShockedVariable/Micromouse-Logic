@@ -33,8 +33,8 @@ void PathFinder::runPath()
 
 void runPathFinder(PathFinder& pathfinder, Maze& maze)
 {
-    // while ()
-    // {
-
-    // }
+     while (!maze.inGoal(pathfinder.getXpos(), pathfinder.getYpos()))
+    {
+        maze.moveMouse(pathfinder);
+    }
 }

@@ -47,6 +47,12 @@ public:
 
     Direction getDir();
 
+    void setXpos(int x);
+
+    void setYpos(int y);
+
+    void setDir(Direction direct);
+
 	// BEGIN MOVEMENT FUNCTIONS
 
     // Makes the micromouse move forward.

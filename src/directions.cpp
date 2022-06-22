@@ -45,7 +45,7 @@ Direction shiftCounterClockwise(const Direction& d)
             dir = Direction::RIGHT;
             break;
         case 2:
-            dir= Direction::BACKWARDS;
+            dir = Direction::BACKWARDS;
             break;
         case 3:
             dir = Direction::LEFT;

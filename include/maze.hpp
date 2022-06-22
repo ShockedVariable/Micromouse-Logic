@@ -2,9 +2,11 @@
 #define maze_hpp
 
 #include <array>
+#include <vector>
 #include "micromouse.hpp"
 
-#define MazeSize 16
+// #define MazeSize 16
+#define MazeSize 5
 
 
 struct Point
@@ -51,6 +53,8 @@ public:
 	{
 		return board;
 	}
+	// surrounding values
+	std::vector<DirPoint> getSurroundingPoints(Point p, std::array<bool*,4>& walls);
 
 	// Returns an array representing the values of vertical walls in the maze
 	std::array<std::array<bool,MazeSize>,MazeSize+1>& getVertical()

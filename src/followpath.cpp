@@ -1,6 +1,7 @@
 #include <deque>
 #include "followpath.hpp"
 #include "micromouse.hpp"
+#include <Arduino.h>
 
 FollowPath::FollowPath(MicroMouse& mouse)
     : mouse{&mouse}
@@ -31,13 +32,25 @@ void FollowPath::runList()
         switch(curr_move.movement)
         {
             case Direction::LEFT:
-                mouse->turnLeft(curr_move.amount);
+                for (int i = 0; i < curr_move.amount; ++i)
+                {
+                    mouse->turnLeft(1);
+                    delay(500);
+                }
                 break;
             case Direction::RIGHT:
-                mouse->turnRight(curr_move.amount);
+                for (int i = 0; i < curr_move.amount; ++i)
+                {
+                    mouse->turnRight(1);
+                    delay(500);
+                }
                 break;
             case Direction::FORWARDS:
-                mouse->goForward(curr_move.amount);
+                for (int i = 0; i < curr_move.amount; ++i)
+                { 
+                    mouse->goForward(1);
+                    delay(500);
+                }
                 break;
             default:
                 break;

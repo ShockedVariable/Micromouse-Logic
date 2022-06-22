@@ -3,8 +3,21 @@
 #include "micromouse.hpp"
 #include "pins.hpp"
 #include "testhelper.hpp"
+#include "pathfinder.hpp"
+#include "followpath.hpp"
+#include "maze.hpp"
 
-MicroMouse mm(0, 0, Direction::FORWARDS);
+MicroMouse mm(0, MazeSize - 1, Direction::FORWARDS);
+
+FollowPath path{mm};
+
+Maze maze{};
+
+bool WaitForSignal(Maze& maze)
+{
+    // Wait till some signal/button is pressed
+    return !maze.checkPath();
+}
 
 void setup() 
 {
@@ -21,15 +34,67 @@ void setup()
 }
 
 void loop()
-{	
-	while (mm.getDistFR() < 900);
+{
+    while (mm.getDistFR() < 900);
 
-	delay(1000);
-	// mm.goForward(1);
-	// delay(1000);
-	mm.turnRight(1);
-	delay(2500);
+	while(WaitForSignal(maze))
+	{
+		// mouse = Mouse{0,MazeSize - 1,0};
+		while(!maze.inGoal(mm.getXpos(), mm.getYpos()))
+		{
+			maze.exploreMaze(mm);
+			maze.moveMouse(mm);
+			// Serial7.printf("%d, %d, %d\r\n", mm.getXpos(), mm.getYpos(), mm.getDir());
+			
+		}
+	}
+	// mm = MicroMouse{0,MazeSize - 1,0};
+	PathFinder pathFinder{mm};
+
+	runPathFinder(pathFinder,maze);
+
+	pathFinder.runPath();
+
+	// while (1)
+	// {
+	// 	std::array<bool, 3> w = mm.getWalls();
+	// 	// Serial7.printf("%d, %d, %d\r\n", w[0], w[1], w[2]);
+	// 	delay(500);
+	// }
 	
+	// delay(500);
+	// path.pushMovement(Direction::FORWARDS);
+    // path.pushMovement(Direction::FORWARDS);
+    // path.pushMovement(Direction::FORWARDS);
+
+    // path.pushMovement(Direction::RIGHT);
+
+    // path.pushMovement(Direction::FORWARDS);
+
+    // path.pushMovement(Direction::RIGHT);
+
+    // path.pushMovement(Direction::FORWARDS);
+    // path.pushMovement(Direction::FORWARDS);
+    // path.pushMovement(Direction::FORWARDS);
+
+    // path.pushMovement(Direction::LEFT);
+
+    // path.pushMovement(Direction::FORWARDS);
+
+    // path.pushMovement(Direction::LEFT);
+
+    // path.pushMovement(Direction::FORWARDS);
+    // path.pushMovement(Direction::FORWARDS);
+
+    // path.pushMovement(Direction::RIGHT);
+
+    // path.pushMovement(Direction::FORWARDS);
+
+    // path.runList();
+	
+
+	delay(2500);
+    
 }
 
 //no resistance, battery full charge
