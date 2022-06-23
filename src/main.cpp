@@ -37,17 +37,17 @@ void loop()
 {
     while (mm.getDistFR() < 900);
 
-	while (WaitForSignal(maze))
-	{
-		// mouse = Mouse{0,MazeSize - 1,0};
-		while (!maze.inGoal(mm.getXpos(), mm.getYpos()))
-		{
-			maze.exploreMaze(mm);
-			maze.moveMouse(mm);
-			// Serial7.printf("%d, %d, %d\r\n", mm.getXpos(), mm.getYpos(), mm.getDir());
+	// while (WaitForSignal(maze))
+	// {
+	// 	// mouse = Mouse{0,MazeSize - 1,0};
+	// 	while (!maze.inGoal(mm.getXpos(), mm.getYpos()))
+	// 	{
+	// 		maze.exploreMaze(mm);
+	// 		maze.moveMouse(mm);
+	// 		// Serial7.printf("%d, %d, %d\r\n", mm.getXpos(), mm.getYpos(), mm.getDir());
 			
-		}
-	}
+	// 	}
+	// }
 
 	// Everything above this point needs to be tested before moving on. The flood fill algorithm still needs to be reviewed by testing.
 	// Everything below this point needs the code to be reviewed.

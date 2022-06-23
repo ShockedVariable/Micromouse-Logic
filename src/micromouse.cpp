@@ -300,7 +300,6 @@ int MicroMouse::getDistL()
     dist = analogRead(RECEIVER_L_PIN);
     digitalWrite(EMIT_L_PIN, LOW);
 
-
     return dist;
 }
 
@@ -377,7 +376,6 @@ Dists MicroMouse::getDistFrontRL()
 
     return _d;
 }
-
 
 void MicroMouse::turnAllEmittersOn()
 {
@@ -478,6 +476,8 @@ void MicroMouse::setMotorLPulseDir(const Direction& dir, const int& mspeed)
             digitalWrite(M2_BACK_PIN, LOW);
             analogWrite(M2_SPD_PIN, 0);
             break;
+        default:
+            break;
     }
 }
 
@@ -500,6 +500,8 @@ void MicroMouse::setMotorRPulseDir(const Direction& dir, const int& mspeed)
             analogWrite(M1_SPD_PIN, 0);
             digitalWrite(M1_FWD_PIN, LOW);
             digitalWrite(M1_BACK_PIN, LOW);
+            break;
+        default:
             break;
     }
 }

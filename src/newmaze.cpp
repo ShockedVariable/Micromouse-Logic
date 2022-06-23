@@ -57,22 +57,22 @@ std::vector<DirPoint> Maze::getSurroundingPoints(const Point& p, const std::arra
 
     if (p.y > 0 && !(*walls.at(0)))
     {
-        blocks.push_back(DirPoint{Point{p.x, (short) (p.y - 1)}, Direction::FORWARDS});
+        blocks.push_back(DirPoint{Point{p.x, static_cast<short>(p.y - 1)}, Direction::FORWARDS});
     }
 
     if (p.x < MazeSize - 1 && !(*walls.at(1)))
     {
-        blocks.push_back(DirPoint{Point{(short) (p.x + 1), p.y}, Direction::RIGHT});
+        blocks.push_back(DirPoint{Point{static_cast<short>(p.x + 1), p.y}, Direction::RIGHT});
     }
 
     if (p.y < MazeSize - 1 && !(*walls.at(2)))
     {
-        blocks.push_back(DirPoint{Point{p.x, (short) (p.y + 1)}, Direction::BACKWARDS});
+        blocks.push_back(DirPoint{Point{p.x, static_cast<short>(p.y + 1)}, Direction::BACKWARDS});
     }
 
     if (p.x > 0 && !(*walls.at(3)))
     {
-        blocks.push_back(DirPoint{Point{(short) (p.x - 1), p.y}, Direction::LEFT});
+        blocks.push_back(DirPoint{Point{static_cast<short>(p.x - 1), p.y}, Direction::LEFT});
     }
 
     return blocks;
@@ -92,7 +92,7 @@ DirPoint Maze::getMinPoint(const std::vector<DirPoint>& surrPoints, MicroMouse& 
 void Maze::moveMouse(MicroMouse& mouse)
 {
     std::array<bool*, 4> walls = getBlockWalls(mouse.getXpos(), mouse.getYpos());
-    Point p{mouse.getXpos(), mouse.getYpos()};
+    Point p{static_cast<short>(mouse.getXpos()), static_cast<short>(mouse.getYpos())};
     std::vector<DirPoint> surr_points = getSurroundingPoints(p, walls);
 
     DirPoint min_point = getMinPoint(surr_points, mouse, dist_board);
