@@ -3,7 +3,7 @@
 #include <PID_v1.h>
 #include "directions.hpp"
 #include "micromouse.hpp"
-#include "testhelper.hpp"
+// #include "testhelper.hpp"
 #include "pins.hpp"
 
 #define DEBUG 1
@@ -42,7 +42,7 @@ const int front_wall_threshold_r = 340;
 
 void shiftDirection(short& x, short& y, const Direction& dir, const short& amt)
 {
-    switch(dir)
+    switch (dir)
     {
         case Direction::FORWARDS:
             y -= amt;
@@ -216,67 +216,78 @@ Direction MicroMouse::getDir()
     return dir;
 }
 
-void MicroMouse::setXpos(int x)
+void MicroMouse::setXpos(const int& x)
 {
     x_pos = x;
 }
 
-void MicroMouse::setYpos(int y)
+void MicroMouse::setYpos(const int& y)
 {
     y_pos = y;
 }
 
-void MicroMouse::setDir(Direction direct)
+void MicroMouse::setDir(const Direction& direct)
 {
     dir = direct;
 }
 
-bool MicroMouse::detectFrontWall() 
+Walls MicroMouse::detectWalls()
 {
-    Dists d = getDistFrontRL();
+    Dists frontDist = getDistFrontRL();
+    Dists sideDist = getDistRL();
 
-    if(d.l > front_wall_threshold_l && d.r > front_wall_threshold_r) 
-    {
-        setMotorL(STOP, 0);
-        setMotorR(STOP, 0);
-        return true;
-    }
-
-    return false;
+    return Walls{.l = sideDist.l >= left_side_wall_threshold, 
+                 .f = frontDist.r >= front_wall_threshold_r && frontDist.l >= front_wall_threshold_l,
+                 .r = sideDist.r >= right_side_wall_threshold};
 }
 
-Walls MicroMouse::detectSideWalls() 
-{
-    Dists d = getDistRL();
-    return Walls {
-            .r = d.r <= right_side_wall_threshold,
-            .l = d.l <= left_side_wall_threshold,
-    };
-}
+// bool MicroMouse::detectFrontWall() 
+// {
+//     Dists d = getDistFrontRL();
 
-std::array<bool, 3> MicroMouse::getWalls()
-{
-    // return getMouseWalls(x_pos, y_pos, dir);
-    
-    int left = getDistL();
-    int right = getDistR();
-    int middle = getDistFL();
+//     if (d.l >= front_wall_threshold_l && d.r >= front_wall_threshold_r) 
+//     {
+//         setMotorL(Direction::STOP, 0);
+//         setMotorR(Direction::STOP, 0);
+//         return true;
+//     }
 
-    //  = getDistFrontRL();
-    
-    bool l =  left > left_side_wall_threshold;
-    bool r = right > right_side_wall_threshold;
-    bool f = middle > front_wall_threshold_l;
+//     return false;
+// }
 
-    // if(d.l > front_wall_threshold_l && d.r > front_wall_threshold_r) 
-    // {
-    //     f = true;
-    // }
-    std::array<bool, 3> walls{l, f, r};
+// Walls MicroMouse::detectSideWalls() 
+// {
+//     Dists d = getDistRL();
+
+//     return Walls {
+//             .r = d.r <= right_side_wall_threshold,
+//             .l = d.l <= left_side_wall_threshold,
+//     };
+// }
+
+// std::array<bool, 3> MicroMouse::getWalls()
+// {
+//     // return getMouseWalls(x_pos, y_pos, dir);
     
-    // Serial7.printf("%d, %d, %d\r\n", l, f, r);
-    return walls;
-}
+//     int left = getDistL();
+//     int right = getDistR();
+//     int middle = getDistFL();
+
+//     //  = getDistFrontRL();
+    
+//     bool l =  left > left_side_wall_threshold;
+//     bool r = right > right_side_wall_threshold;
+//     bool f = middle > front_wall_threshold_l;
+
+//     // if(d.l > front_wall_threshold_l && d.r > front_wall_threshold_r) 
+//     // {
+//     //     f = true;
+//     // }
+//     std::array<bool, 3> walls{l, f, r};
+    
+//     // Serial7.printf("%d, %d, %d\r\n", l, f, r);
+//     return walls;
+// }
 
 int MicroMouse::getDistL()
 {
@@ -307,30 +318,6 @@ int MicroMouse::getDistR()
     return dist;
 }
 
-Dists MicroMouse::getDistRL()
-{
-    digitalWrite(EMIT_L_PIN, HIGH);
-    digitalWrite(EMIT_R_PIN, HIGH);
-    delay(EMITTER_ON_TIME);
-
-    _d.r = analogRead(RECEIVER_R_PIN);
-    _d.l = analogRead(RECEIVER_L_PIN);
-
-    return _d;
-}
-
-Dists MicroMouse::getDistFrontRL()
-{
-    digitalWrite(EMIT_FL_PIN, HIGH);
-    digitalWrite(EMIT_FR_PIN, HIGH);
-    delay(EMITTER_ON_TIME);
-
-    _d.r = analogRead(RECEIVER_FR_PIN);
-    _d.l = analogRead(RECEIVER_FL_PIN);
-
-    return _d;
-}
-
 int MicroMouse::getDistFR()
 {
     int dist;
@@ -358,6 +345,39 @@ int MicroMouse::getDistFL()
 
     return dist;
 }
+
+// Could have used the getDistL() and getDistR() functions but that would introduce unnecessary delay by 
+// calling the functions twice since both functions have a delay of EMITTER_ON_TIME.
+Dists MicroMouse::getDistRL()
+{
+    digitalWrite(EMIT_L_PIN, HIGH);
+    digitalWrite(EMIT_R_PIN, HIGH);
+    delay(EMITTER_ON_TIME);
+
+    _d.r = analogRead(RECEIVER_R_PIN);
+    _d.l = analogRead(RECEIVER_L_PIN);
+
+    digitalWrite(EMIT_L_PIN, LOW);
+    digitalWrite(EMIT_R_PIN, LOW);
+
+    return _d;
+}
+
+Dists MicroMouse::getDistFrontRL()
+{
+    digitalWrite(EMIT_FL_PIN, HIGH);
+    digitalWrite(EMIT_FR_PIN, HIGH);
+    delay(EMITTER_ON_TIME);
+
+    _d.r = analogRead(RECEIVER_FR_PIN);
+    _d.l = analogRead(RECEIVER_FL_PIN);
+
+    digitalWrite(EMIT_FL_PIN, LOW);
+    digitalWrite(EMIT_FR_PIN, LOW);
+
+    return _d;
+}
+
 
 void MicroMouse::turnAllEmittersOn()
 {
@@ -408,6 +428,8 @@ void MicroMouse::setMotorL(const Direction& dir, const int& mspeed)
 			digitalWriteFast(M2_BACK_PIN, LOW);
 			analogWrite(M2_SPD_PIN, 0);
 			break;
+        default:
+            break;
 	}
 }
 
@@ -430,8 +452,11 @@ void MicroMouse::setMotorR(const Direction& dir, const int& mspeed)
 			digitalWriteFast(M1_BACK_PIN, LOW);
             analogWrite(M1_SPD_PIN, 0);
 			break;
+        default:
+            break;
 	}
 }
+
 // TODO: figure out what this function does 
 void MicroMouse::setMotorLPulseDir(const Direction& dir, const int& mspeed)
 {
@@ -479,25 +504,25 @@ void MicroMouse::setMotorRPulseDir(const Direction& dir, const int& mspeed)
     }
 }
 
-unsigned int MicroMouse::enc_backwards_l_val()
-{
-    return enc_backwards_l_count;
-}
+// unsigned int MicroMouse::enc_backwards_l_val()
+// {
+//     return enc_backwards_l_count;
+// }
 
-unsigned int MicroMouse::enc_forwards_l_val()
-{
-    return enc_forwards_l_count;
-}
+// unsigned int MicroMouse::enc_forwards_l_val()
+// {
+//     return enc_forwards_l_count;
+// }
 
-unsigned int MicroMouse::enc_backwards_r_val()
-{
-    return enc_backwards_r_count;
-}
+// unsigned int MicroMouse::enc_backwards_r_val()
+// {
+//     return enc_backwards_r_count;
+// }
 
-unsigned int MicroMouse::enc_forwards_r_val()
-{
-    return enc_forwards_r_count;
-}
+// unsigned int MicroMouse::enc_forwards_r_val()
+// {
+//     return enc_forwards_r_count;
+// }
 
 void MicroMouse::rst_enc_backwards_l_counter()
 {
@@ -531,10 +556,11 @@ void MicroMouse::goForward(const int& blocks)
 {
     rstAllEncCounters();
 
-    setMotorL(FORWARDS, l_spd_motor);
-    setMotorR(FORWARDS, 0);
-    setMotorR(FORWARDS, r_spd_motor);
-
+    setMotorL(Direction::FORWARDS, l_spd_motor);
+    setMotorR(Direction::FORWARDS, 0);
+    setMotorR(Direction::FORWARDS, r_spd_motor);
+    
+    // To account for momentum, we need to stop the motors earlier.
     const int offset = 10;
 
     const unsigned int to_move = (ticks_to_move * blocks) - offset;
@@ -584,8 +610,8 @@ void MicroMouse::goForward(const int& blocks)
             digitalWriteFast(BUZZ_PIN, LOW);
         }
 
-        setMotorL(FORWARDS, proposed_l_spd);
-        setMotorR(FORWARDS, proposed_r_spd);
+        setMotorL(Direction::FORWARDS, proposed_l_spd);
+        setMotorR(Direction::FORWARDS, proposed_r_spd);
 
     }
     
@@ -596,8 +622,8 @@ void MicroMouse::goForward(const int& blocks)
 
     while (enc_forwards_l_count <= offset && enc_forwards_r_count <= offset);
 
-    setMotorL(STOP, 0);
-    setMotorR(STOP, 0);
+    setMotorL(Direction::STOP, 0);
+    setMotorR(Direction::STOP, 0);
 
     rstAllEncCounters();
 }
@@ -606,24 +632,25 @@ void MicroMouse::turnRight(const int& blocks)
 {
     rstAllEncCounters();
 
-    setMotorL(FORWARDS, l_spd_motor);
-    setMotorR(BACKWARDS, 0);
-    setMotorR(BACKWARDS, r_spd_motor);
+    setMotorL(Direction::FORWARDS, l_spd_motor);
+    setMotorR(Direction::BACKWARDS, 0);
+    setMotorR(Direction::BACKWARDS, r_spd_motor);
 
     const int offset = 5;
     const unsigned int to_move = (turn_ticks * blocks) - offset;
 
-    while (enc_forwards_l_count <= to_move && enc_backwards_r_count <= to_move);
+    while (enc_forwards_l_count <= to_move || enc_backwards_r_count <= to_move);
 
     rstAllEncCounters();
 
+    // Why is this needed?
     setMotorL(Direction::BACKWARDS, 100);
     setMotorR(Direction::BACKWARDS, 100);
 
-    while(enc_forwards_l_count <= offset && enc_backwards_r_count <= offset);
+    while (enc_forwards_l_count <= offset || enc_backwards_r_count <= offset);
 
-    setMotorL(STOP, 0);
-    setMotorR(STOP, 0);
+    setMotorL(Direction::STOP, 0);
+    setMotorR(Direction::STOP, 0);
 
     rstAllEncCounters();
 }
@@ -632,9 +659,9 @@ void MicroMouse::turnLeft(const int& blocks)
 {
     rstAllEncCounters();
 
-    setMotorL(BACKWARDS, l_spd_motor);
-    setMotorR(FORWARDS, 0);
-    setMotorR(FORWARDS, r_spd_motor);
+    setMotorL(Direction::BACKWARDS, l_spd_motor);
+    setMotorR(Direction::FORWARDS, 0);
+    setMotorR(Direction::FORWARDS, r_spd_motor);
 
     const int offset = 5;
     const unsigned int to_move = (turn_ticks * blocks) - offset;
@@ -643,13 +670,14 @@ void MicroMouse::turnLeft(const int& blocks)
 
     rstAllEncCounters();
 
+    // Why is this needed?
     setMotorL(Direction::BACKWARDS, 100);
     setMotorR(Direction::BACKWARDS, 100);
 
     while (enc_backwards_l_count <= offset || enc_forwards_r_count <= offset);
 
-    setMotorL(STOP, 0);
-    setMotorR(STOP, 0);
+    setMotorL(Direction::STOP, 0);
+    setMotorR(Direction::STOP, 0);
 
     rstAllEncCounters();
 }

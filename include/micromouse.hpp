@@ -11,9 +11,10 @@ struct Dists
 };
 
 struct Walls
-{
-    bool r;
+{   
     bool l;
+    bool f;
+    bool r;
 };
 
 void shiftDirection(short& x, short& y, const Direction& dir, const short& amt = 1);
@@ -47,11 +48,11 @@ public:
 
     Direction getDir();
 
-    void setXpos(int x);
+    void setXpos(const int& x);
 
-    void setYpos(int y);
+    void setYpos(const int& y);
 
-    void setDir(Direction direct);
+    void setDir(const Direction& direct);
 
 	// BEGIN MOVEMENT FUNCTIONS
 
@@ -95,18 +96,21 @@ public:
 
 
     // BEGIN CHECK WALLS
-    bool detectFrontWall();
+    // bool detectFrontWall();
 
-    Walls detectSideWalls();
+    // Walls detectSideWalls();
+
+    Walls detectWalls();
 
     // END CHECK WALLS
 
 
     // BEGIN GET WALLS FUNCTION
 
-    std::array<bool, 3> getWalls();
+    // std::array<bool, 3> getWalls();
 
-    //
+    // END GET WALLS FUNCTION
+
 
     // BEGIN SET MOTOR FUNCTIONS
 
@@ -130,21 +134,21 @@ public:
 	in the serial monitor we see ENCB first, we know that we are moving forwards.
 	*/
 
-    // BEGIN GET ENCODER COUNTER FUNCTIONS
+    // // BEGIN GET ENCODER COUNTER FUNCTIONS
 
-    // Returns the current tick count of the left enc_a.
-    unsigned int enc_backwards_l_val();
+    // // Returns the current tick count of the left enc_a.
+    // unsigned int enc_backwards_l_val();
 
-    // Returns the current tick count of the left enc_b.
-    unsigned int enc_forwards_l_val();
+    // // Returns the current tick count of the left enc_b.
+    // unsigned int enc_forwards_l_val();
 
-    // Returns the current tick count of the right enc_a.
-    unsigned int enc_backwards_r_val();
+    // // Returns the current tick count of the right enc_a.
+    // unsigned int enc_backwards_r_val();
 
-    // Returns the current tick count of the right enc_b.
-    unsigned int enc_forwards_r_val();
+    // // Returns the current tick count of the right enc_b.
+    // unsigned int enc_forwards_r_val();
 
-    // END GET ENCODER COUNTER FUNCTIONS
+    // // END GET ENCODER COUNTER FUNCTIONS
 
 
     // BEGIN RESET COUNTER FUNCTIONS
@@ -243,6 +247,8 @@ private:
     // Stores the sensor reading of the mouse when placed in the center during setup.
     static int center;
 
+    // Uncertain if I need separate dists for RL and Front RL.
+    // Would need to modify getDistRL() and getDistFrontRL() to account for this if true.
     Dists _d;
 
 

@@ -1,5 +1,5 @@
 #include "directions.hpp"
-#include "maze.hpp"
+#include "newmaze.hpp"
 #include "micromouse.hpp"
 #include "pathfinder.hpp"
 

@@ -1,7 +1,7 @@
+#include <Arduino.h>
 #include <deque>
 #include "followpath.hpp"
 #include "micromouse.hpp"
-#include <Arduino.h>
 
 FollowPath::FollowPath(MicroMouse& mouse)
     : mouse{&mouse}
@@ -28,28 +28,30 @@ void FollowPath::runList()
     {
         curr_move = pathList.front();
         pathList.pop_front();
-
-        switch(curr_move.movement)
+        
+        // Note: We do not need to worry about moving backwards, since it is never a move we queue.
+        // Also, not certain if we need the delays.
+        switch (curr_move.movement)
         {
             case Direction::LEFT:
                 for (int i = 0; i < curr_move.amount; ++i)
                 {
                     mouse->turnLeft(1);
-                    delay(500);
+                    // delay(500);
                 }
                 break;
             case Direction::RIGHT:
                 for (int i = 0; i < curr_move.amount; ++i)
                 {
                     mouse->turnRight(1);
-                    delay(500);
+                    // delay(500);
                 }
                 break;
             case Direction::FORWARDS:
                 for (int i = 0; i < curr_move.amount; ++i)
                 { 
                     mouse->goForward(1);
-                    delay(500);
+                    // delay(500);
                 }
                 break;
             default:

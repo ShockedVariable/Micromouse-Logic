@@ -1,11 +1,11 @@
 #include <Arduino.h>
 #include "directions.hpp"
-#include "micromouse.hpp"
-#include "pins.hpp"
-#include "testhelper.hpp"
-#include "pathfinder.hpp"
 #include "followpath.hpp"
-#include "maze.hpp"
+#include "micromouse.hpp"
+#include "newmaze.hpp"
+#include "pathfinder.hpp"
+#include "pins.hpp"
+// #include "testhelper.hpp"
 
 MicroMouse mm(0, MazeSize - 1, Direction::FORWARDS);
 
@@ -23,7 +23,7 @@ void setup()
 {
 	mm.initConnections();
 	mm.attachInterrupts();
-	setupTestMaze();
+	// setupTestMaze();
 
 	mm.findCenter();
 
@@ -37,10 +37,10 @@ void loop()
 {
     while (mm.getDistFR() < 900);
 
-	while(WaitForSignal(maze))
+	while (WaitForSignal(maze))
 	{
 		// mouse = Mouse{0,MazeSize - 1,0};
-		while(!maze.inGoal(mm.getXpos(), mm.getYpos()))
+		while (!maze.inGoal(mm.getXpos(), mm.getYpos()))
 		{
 			maze.exploreMaze(mm);
 			maze.moveMouse(mm);
@@ -48,6 +48,10 @@ void loop()
 			
 		}
 	}
+
+	// Everything above this point needs to be tested before moving on. The flood fill algorithm still needs to be reviewed by testing.
+	// Everything below this point needs the code to be reviewed.
+
 	// mm = MicroMouse{0,MazeSize - 1,0};
 	PathFinder pathFinder{mm};
 

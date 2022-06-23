@@ -1,88 +1,86 @@
-#ifndef maze_hpp
-#define maze_hpp
+// #ifndef maze_hpp
+// #define maze_hpp
 
-#include <array>
-#include <vector>
-#include "micromouse.hpp"
+// #include <array>
+// #include <vector>
+// #include "micromouse.hpp"
 
 // #define MazeSize 16
-#define MazeSize 5
+
+// struct Point
+// {
+// 	short x,y;
+// };
+
+// struct DirPoint
+// {
+// 	Point position;
+// 	Direction direction;
+// }; 
 
 
-struct Point
-{
-	short x,y;
-};
+// class Maze
+// {
+// public:
+// 	Maze();
 
-struct DirPoint
-{
-	Point position;
-	Direction direction;
-}; 
+// 	// Returns an array representing the walls around point (<x>,<y>) in the format [Up,Right,Down,Left]
+// 	std::array<bool*,4> getBlockWalls(short x, short y);
 
+// 	// Prints a representation of the maze that has been discovered, marks the block on the maze at point (<x>,<y>)
+// 	// void printMaze(short x = -1, short y = -1);
 
-class Maze
-{
-public:
-	Maze();
+// 	// General function that determines the walls around the mouse <mouse> and then fixes the distances from the center
+// 	// of the various blocks in the maze
+// 	void exploreMaze(MicroMouse& mouse);
 
-	// Returns an array representing the walls around point (<x>,<y>) in the format [Up,Right,Down,Left]
-	std::array<bool*,4> getBlockWalls(short x, short y);
+// 	// Moves the mouse in the best direction based on the state of the maze
+// 	void moveMouse(MicroMouse& mouse);
 
-	// Prints a representation of the maze that has been discovered, marks the block on the maze at point (<x>,<y>)
-	// void printMaze(short x = -1, short y = -1);
+// 	// Fixes the distances from the center of the maze assuming new walls were placed at point (<x>,<y>)
+// 	void fixMaze(short x, short y);
 
-	// General function that determines the walls around the mouse <mouse> and then fixes the distances from the center
-	// of the various blocks in the maze
-	void exploreMaze(MicroMouse& mouse);
+// 	// Sets the walls of the block at point (<x>,<y>) to the values of <up>, <right>, <down>, and <left>
+// 	void setWalls(short x, short y, bool up, bool right, bool down, bool left);
 
-	// Moves the mouse in the best direction based on the state of the maze
-	void moveMouse(MicroMouse& mouse);
+// 	// Determines of point (<x>,<y>) is in the goal
+// 	bool inGoal(short x, short y);
 
-	// Fixes the distances from the center of the maze assuming new walls were placed at point (<x>,<y>)
-	void fixMaze(short x, short y);
+// 	// Returns the board containing the distances of blocks from the center
+// 	std::array<std::array<int,MazeSize>,MazeSize>& getBoard()
+// 	{
+// 		return board;
+// 	}
+// 	// surrounding values
+// 	std::vector<DirPoint> getSurroundingPoints(Point p, std::array<bool*,4>& walls);
 
-	// Sets the walls of the block at point (<x>,<y>) to the values of <up>, <right>, <down>, and <left>
-	void setWalls(short x, short y, bool up, bool right, bool down, bool left);
+// 	// Returns an array representing the values of vertical walls in the maze
+// 	std::array<std::array<bool,MazeSize>,MazeSize+1>& getVertical()
+// 	{
+// 		return vertical;
+// 	}
 
-	// Determines of point (<x>,<y>) is in the goal
-	bool inGoal(short x, short y);
+//     // Returns an array representing the values of horizontal walls in the maze
+// 	std::array<std::array<bool,MazeSize+1>,MazeSize>& getHorizontal()
+// 	{
+// 		return horizontal;
+// 	}
 
-	// Returns the board containing the distances of blocks from the center
-	std::array<std::array<int,MazeSize>,MazeSize>& getBoard()
-	{
-		return board;
-	}
-	// surrounding values
-	std::vector<DirPoint> getSurroundingPoints(Point p, std::array<bool*,4>& walls);
+// 	// Returns if the current path is the "final path" or the most optimal path, should only be called once between explorations
+// 	bool checkPath();
 
-	// Returns an array representing the values of vertical walls in the maze
-	std::array<std::array<bool,MazeSize>,MazeSize+1>& getVertical()
-	{
-		return vertical;
-	}
+// private:
+// 	// Store the maze
+// 	std::array<std::array<int,MazeSize>,MazeSize> board; // Keeps track of blocks distances from the center
+// 	std::array<std::array<bool,MazeSize>,MazeSize+1> vertical; // Keeps track of the vertical walls
+// 	std::array<std::array<bool,MazeSize+1>,MazeSize> horizontal; // Keeps track of the horizontal walls
 
-    // Returns an array representing the values of horizontal walls in the maze
-	std::array<std::array<bool,MazeSize+1>,MazeSize>& getHorizontal()
-	{
-		return horizontal;
-	}
+// 	// Optimizations
+// 	std::array<std::array<bool,MazeSize>,MazeSize> explored; // Keeps track of previously explored blocks 
 
-	// Returns if the current path is the "final path" or the most optimal path, should only be called once between explorations
-	bool checkPath();
-
-private:
-	// Store the maze
-	std::array<std::array<int,MazeSize>,MazeSize> board; // Keeps track of blocks distances from the center
-	std::array<std::array<bool,MazeSize>,MazeSize+1> vertical; // Keeps track of the vertical walls
-	std::array<std::array<bool,MazeSize+1>,MazeSize> horizontal; // Keeps track of the horizontal walls
-
-	// Optimizations
-	std::array<std::array<bool,MazeSize>,MazeSize> explored; // Keeps track of previously explored blocks 
-
-	bool finalPath;
-};
+// 	bool finalPath;
+// };
 
 
 
-#endif
+// #endif
