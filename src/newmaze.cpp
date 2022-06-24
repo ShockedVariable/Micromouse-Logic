@@ -99,8 +99,7 @@ void Maze::moveMouse(MicroMouse& mouse)
 
     mouse.setXpos(min_point.position.x);
     mouse.setYpos(min_point.position.y);
-    mouse.setDir(min_point.direction);
-
+    
     if (min_point.direction == mouse.getDir())
     {
         mouse.goForward();
@@ -129,6 +128,8 @@ void Maze::moveMouse(MicroMouse& mouse)
         mouse.goForward();
         // delay(500); // not sure if needed.
     }
+
+    mouse.setDir(min_point.direction);
 }
 
 

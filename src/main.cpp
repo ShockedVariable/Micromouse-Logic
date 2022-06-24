@@ -5,7 +5,6 @@
 #include "newmaze.hpp"
 #include "pathfinder.hpp"
 #include "pins.hpp"
-// #include "testhelper.hpp"
 
 MicroMouse mm(0, MazeSize - 1, Direction::FORWARDS);
 
@@ -53,11 +52,11 @@ void loop()
 	// Everything below this point needs the code to be reviewed.
 
 	// mm = MicroMouse{0,MazeSize - 1,0};
-	PathFinder pathFinder{mm};
+	// PathFinder pathFinder{mm};
 
-	runPathFinder(pathFinder,maze);
+	// runPathFinder(pathFinder,maze);
 
-	pathFinder.runPath();
+	// pathFinder.runPath();
 
 	// while (1)
 	// {
@@ -97,7 +96,7 @@ void loop()
     // path.runList();
 	
 
-	delay(2500);
+	// delay(2500);
     
 }
 
