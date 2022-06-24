@@ -132,7 +132,6 @@ void Maze::moveMouse(MicroMouse& mouse)
     mouse.setDir(min_point.direction);
 }
 
-
 void Maze::floodFill(const short& x, const short& y)
 {
     if (inGoal(x, y))

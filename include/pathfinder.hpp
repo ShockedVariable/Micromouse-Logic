@@ -3,7 +3,7 @@
 
 #include "followpath.hpp"
 #include "micromouse.hpp"
-#include "maze.hpp"
+#include "newmaze.hpp"
 
 class PathFinder: public MicroMouse
 {

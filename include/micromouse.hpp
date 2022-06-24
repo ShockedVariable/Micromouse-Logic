@@ -134,23 +134,6 @@ public:
 	in the serial monitor we see ENCB first, we know that we are moving forwards.
 	*/
 
-    // // BEGIN GET ENCODER COUNTER FUNCTIONS
-
-    // // Returns the current tick count of the left enc_a.
-    // unsigned int enc_backwards_l_val();
-
-    // // Returns the current tick count of the left enc_b.
-    // unsigned int enc_forwards_l_val();
-
-    // // Returns the current tick count of the right enc_a.
-    // unsigned int enc_backwards_r_val();
-
-    // // Returns the current tick count of the right enc_b.
-    // unsigned int enc_forwards_r_val();
-
-    // // END GET ENCODER COUNTER FUNCTIONS
-
-
     // BEGIN RESET COUNTER FUNCTIONS
 
     // Resets the left counter for enc_a.

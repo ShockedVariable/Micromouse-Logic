@@ -22,7 +22,6 @@ void setup()
 {
 	mm.initConnections();
 	mm.attachInterrupts();
-	// setupTestMaze();
 
 	mm.findCenter();
 

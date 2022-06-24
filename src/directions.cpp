@@ -5,7 +5,7 @@ Direction shiftClockwise(const Direction& d)
     const unsigned char direction_temp = (d + 1) % 4;
     Direction dir;
     
-    switch(direction_temp)
+    switch (direction_temp)
     {
         case 0:
             dir = Direction::FORWARDS;
@@ -14,7 +14,7 @@ Direction shiftClockwise(const Direction& d)
             dir = Direction::RIGHT;
             break;
         case 2:
-            dir= Direction::BACKWARDS;
+            dir = Direction::BACKWARDS;
             break;
         case 3:
             dir = Direction::LEFT;
@@ -36,7 +36,7 @@ Direction shiftCounterClockwise(const Direction& d)
     const unsigned char direction_temp = (d - 1) % 4; 
     Direction dir;
 
-    switch(direction_temp)
+    switch (direction_temp)
     {
         case 0:
             dir = Direction::FORWARDS;

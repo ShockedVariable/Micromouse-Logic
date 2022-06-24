@@ -4,8 +4,6 @@
 #include "micromouse.hpp"
 #include "pins.hpp"
 
-#define DEBUG 1
-
 // By-product of using static member variables. Could this be implemented better? Check note in header file.
 // For now, it works fine as long as we do not instanitate another MicroMouse object.
 volatile unsigned int MicroMouse::enc_backwards_l_count = 0;
@@ -231,12 +229,12 @@ void MicroMouse::setDir(const Direction& direct)
 
 Walls MicroMouse::detectWalls()
 {
-    Dists frontDist = getDistFrontRL();
-    Dists sideDist = getDistRL();
+    Dists front_dist = getDistFrontRL();
+    Dists side_dist = getDistRL();
 
-    return Walls{.l = sideDist.l >= left_side_wall_threshold, 
-                 .f = frontDist.r >= front_wall_threshold_r && frontDist.l >= front_wall_threshold_l,
-                 .r = sideDist.r >= right_side_wall_threshold};
+    return Walls{.l = side_dist.l >= left_side_wall_threshold, 
+                 .f = front_dist.r >= front_wall_threshold_r && front_dist.l >= front_wall_threshold_l,
+                 .r = side_dist.r >= right_side_wall_threshold};
 }
 
 // bool MicroMouse::detectFrontWall() 
@@ -503,26 +501,6 @@ void MicroMouse::setMotorRPulseDir(const Direction& dir, const int& mspeed)
             break;
     }
 }
-
-// unsigned int MicroMouse::enc_backwards_l_val()
-// {
-//     return enc_backwards_l_count;
-// }
-
-// unsigned int MicroMouse::enc_forwards_l_val()
-// {
-//     return enc_forwards_l_count;
-// }
-
-// unsigned int MicroMouse::enc_backwards_r_val()
-// {
-//     return enc_backwards_r_count;
-// }
-
-// unsigned int MicroMouse::enc_forwards_r_val()
-// {
-//     return enc_forwards_r_count;
-// }
 
 void MicroMouse::rst_enc_backwards_l_counter()
 {
